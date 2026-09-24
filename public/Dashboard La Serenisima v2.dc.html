@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&amp;family=Raleway:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F4F2;font-family:'Raleway',system-ui,sans-serif;color:#1F2328}
+a{color:#3A4048;text-decoration:underline}
+a:hover{color:#7BC47F}
+*{box-sizing:border-box}
+@keyframes breathe{0%{transform:scale(.94) rotate(0deg);opacity:.85}100%{transform:scale(1.06) rotate(25deg);opacity:1}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(229,72,77,.55)}70%{box-shadow:0 0 0 9px rgba(229,72,77,0)}100%{box-shadow:0 0 0 0 rgba(229,72,77,0)}}
+@keyframes pulseg{0%{box-shadow:0 0 0 0 rgba(123,196,127,.6)}70%{box-shadow:0 0 0 9px rgba(123,196,127,0)}100%{box-shadow:0 0 0 0 rgba(123,196,127,0)}}
+@keyframes spinslow{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+<header style="background:#ECEDEF;color:#1F2328;position:relative">
+  <div style="max-width:1320px;margin:0 auto;padding:14px 44px 16px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;line-height:1.1;letter-spacing:.02em;text-transform:uppercase;margin-bottom:2px;text-wrap:balance">La Serenísima <span style="color:#7BC47F">·</span> Monitor de conversación</span>
+        <span style="font-size:12px;color:#5F6670;font-weight:500">Riesgo reputacional por el conflicto logístico-laboral · X, Instagram y TikTok</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #DCDFE3;border-radius:999px;padding:5px 11px;font-size:11px;color:#5F6670;white-space:nowrap">
+      <span style="width:7px;height:7px;border-radius:50%;background:#7BC47F;flex:none"></span>
+      <span>Última actualización con Meltwater: <b style="color:#1F2328">{{ updatedLabel }}</b></span>
+    </div>
+  </div>
+  
+</header>
+<nav style="position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid #E5E7EA">
+  <div style="max-width:1320px;margin:0 auto;padding:0 30px;display:flex;gap:4px;overflow-x:auto">
+    <a href="#mapa" style="padding:14px 14px;font-weight:600;font-size:12px;color:#1F2328;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap" style-hover="border-bottom:3px solid #7BC47F;color:#1F2328">Mapa</a>
+    <a href="#volumen" style="padding:14px 14px;font-weight:600;font-size:12px;color:#1F2328;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap" style-hover="border-bottom:3px solid #7BC47F;color:#1F2328">Resumen</a>
+    <a href="#ejes" style="padding:14px 14px;font-weight:600;font-size:12px;color:#1F2328;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap" style-hover="border-bottom:3px solid #7BC47F;color:#1F2328">9 ejes</a>
+    <a href="#publicaciones" style="padding:14px 14px;font-weight:600;font-size:12px;color:#1F2328;text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap" style-hover="border-bottom:3px solid #7BC47F;color:#1F2328">Publicaciones</a>
+  </div>
+</nav>
+
+<main style="max-width:1320px;width:100%;margin:0 auto;padding:18px 24px 48px;display:flex;flex-direction:column;gap:16px">
+
+  <section id="mapa" style="scroll-margin-top:70px;background:#fff;border-radius:20px;padding:20px;display:flex;flex-wrap:wrap;gap:20px;align-items:stretch">
+    <div style="flex:1 1 560px;min-width:0;display:flex;flex-direction:column;gap:20px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:4px;align-self:stretch;margin-top:16px">
+      <span style="display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1F2328">{{ pulseDot }}Mapa de riesgo por eje</span>
+      <span style="font-size:12px;color:#5F6670;padding-left:20px">Cada eje tiene un semáforo que indica dónde se concentra hoy el mayor riesgo para la marca. Tocá un eje para ver el detalle.</span>
+    </div>
+    <div ref="{{ mapRef }}" style="position:relative;width:100%;max-width:940px;aspect-ratio:1;container-type:inline-size">
+      {{ linesEl }}
+      <div style="position:absolute;left:26%;top:26%;width:48%;height:48%">
+        {{ blobEl }}
+        <div style="position:absolute;inset:-9%;border-radius:50%;border:1px dashed #C9CDD2"></div>
+        {{ ringEl }}
+        <div style="position:absolute;inset:22%;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px">
+          <span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#3A4048;font-weight:700">Riesgo reputacional</span>
+          <span style="font-family:'Barlow Condensed';font-weight:800;font-size:30px;line-height:1;color:#1F2328">MODERADO</span>
+          <span style="font-size:11px;color:#3A4048">146 menciones · 30 días</span>
+          <button onClick="{{ openRisk }}" style="margin-top:8px;border:0;background:#1F2328;color:#fff;border-radius:999px;padding:7px 14px;font-family:'Raleway';font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;box-shadow:0 6px 16px rgba(31,35,40,.18)" style-hover="background:#F39200">Conocé un poco más</button>
+        </div>
+      </div>
+      <sc-for list="{{ heroNodes }}" as="n" hint-placeholder-count="9">
+        <button data-node="{{ n.n }}" onClick="{{ n.onClick }}" style="position:absolute;left:{{ n.x }}%;top:{{ n.y }}%;transform:translate(-50%,-50%);width:clamp(96px,23cqw,140px);border:1px solid #E5E7EA;background:#fff;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;cursor:pointer;font-family:'Raleway';text-align:left;box-shadow:0 4px 14px rgba(31,35,40,.06)" style-hover="box-shadow:0 8px 22px rgba(31,35,40,.16);border-color:#C9CDD2">
+          <span style="display:flex;justify-content:space-between;width:100%;align-items:center;gap:6px">
+            <span style="font-family:'Barlow Condensed';font-weight:700;font-size:14px;color:#9AA1A9">{{ n.n }}</span>
+            <span style="display:flex;gap:3px;background:#ECEDEF;border-radius:999px;padding:3px 5px">
+              <sc-for list="{{ n.lights }}" as="c" hint-placeholder-count="3">
+                <span style="width:9px;height:9px;border-radius:50%;background:{{ c.c }};opacity:{{ c.op }};box-shadow:{{ c.sh }}"></span>
+              </sc-for>
+            </span>
+          </span>
+          <span style="font-size:clamp(12px,2.6cqw,15px);font-weight:700;line-height:1.15;color:#1F2328;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%">{{ n.t }}</span>
+          <span style="font-size:12px;font-weight:600;color:{{ n.tc }}">{{ n.lvl }}</span>
+        </button>
+      </sc-for>
+    </div>
+    </div>
+  <div id="volumen" style="scroll-margin-top:70px;flex:0 1 200px;max-width:210px;min-width:180px;display:flex;flex-direction:column;gap:20px">
+    <span style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#1F2328;line-height:17px;display:flex;align-items:center;gap:10px;margin-top:16px">{{ pulseDotG }}Resumen de números</span>
+  <div ref="{{ kpiRef }}" style="display:flex;flex-direction:column;gap:8px;margin-top:{{ kpiOffset }}px">
+    <div style="background:#fff;border:1px solid #E5E7EA;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10px;color:#5F6670;font-weight:700;text-transform:uppercase;letter-spacing:.08em">Menciones de La Serenísima</span>
+      <span style="font-family:'Barlow Condensed';font-weight:800;font-size:24px;line-height:1;color:#1F2328">{{ kpi.total }}</span>
+      <span style="font-size:11px;color:#5F6670;line-height:1.35">Publicaciones que nombran a la marca junto a algún término de los 9 ejes · {{ kpi.periodLabel }}</span>
+      <button onClick="{{ openChart }}" style="align-self:flex-start;border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:3px 10px;white-space:nowrap;line-height:1.3;font-family:'Raleway';font-weight:700;font-size:12px;color:#1F2328;cursor:pointer" style-hover="border-color:#7BC47F;color:#3E8E48">Ver más</button>
+    </div>
+    <div style="background:#fff;border:1px solid #E5E7EA;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10px;color:#5F6670;font-weight:700;text-transform:uppercase;letter-spacing:.08em">Pico diario de menciones</span>
+      <span style="font-family:'Barlow Condensed';font-weight:800;font-size:24px;line-height:1;color:#7BC47F">{{ kpi.peak }}</span>
+      <span style="font-size:11px;color:#5F6670;line-height:1.35">Día con más publicaciones sobre la marca: {{ kpi.peakDay }}{{ kpi.peakNote }}</span>
+    </div>
+    <div style="background:#fff;border:1px solid #E5E7EA;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10px;color:#5F6670;font-weight:700;text-transform:uppercase;letter-spacing:.08em">Promedio diario</span>
+      <span style="font-family:'Barlow Condensed';font-weight:800;font-size:24px;line-height:1;color:#1F2328">{{ kpi.avg }}</span>
+      <span style="font-size:11px;color:#5F6670;line-height:1.35">Publicaciones por día sobre La Serenísima en el período</span>
+    </div>
+    <div style="background:#fff;border:1px solid #E5E7EA;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10px;color:#5F6670;font-weight:700;text-transform:uppercase;letter-spacing:.08em">Tono negativo</span>
+      <span style="font-family:'Barlow Condensed';font-weight:800;font-size:24px;line-height:1;color:#7BC47F">{{ live.negPct }}</span>
+      <span style="font-size:11px;color:#5F6670;line-height:1.35">{{ live.neg }} de {{ live.total }} publicaciones sobre la marca · 30 días</span>
+      <button onClick="{{ toggleWhy }}" style="align-self:flex-start;border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:3px 10px;white-space:nowrap;line-height:1.3;font-family:'Raleway';font-weight:700;font-size:12px;color:#1F2328;cursor:pointer" style-hover="border-color:#7BC47F;color:#3E8E48">{{ whyLabel }}</button>
+    </div>
+    <div style="background:#fff;border:1px solid #E5E7EA;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px">
+      <span style="font-size:10px;color:#5F6670;font-weight:700;text-transform:uppercase;letter-spacing:.08em">Plataformas</span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:64px;height:64px;border-radius:50%;flex:none;background:{{ live.pie }}"></div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:#AEB4BB"></span><span style="white-space:nowrap">X · {{ live.x }} ({{ live.xPct }})</span></span>
+          <span style="display:flex;align-items:center;gap:6px;color:#3E8E48"><span style="width:9px;height:9px;border-radius:50%;background:#7BC47F"></span><span style="white-space:nowrap">IG · {{ live.ig }} ({{ live.igPct }})</span></span>
+          <span style="display:flex;align-items:center;gap:6px;color:#5F6670;font-weight:500"><span style="width:9px;height:9px;border-radius:50%;background:#DCDFE3"></span><span style="white-space:nowrap">TikTok · {{ live.tt }}</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </section>
+  <sc-if value="{{ showWhy }}" hint-placeholder-val="{{ false }}">
+    <section style="background:#EAF6EA;border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px 24px;font-size:12px;line-height:1.5;color:#3A4048">
+      <span><b style="color:#1F2328">Cómo se calcula el tono negativo:</b> cada publicación recibe un tono (positivo, neutro o negativo) según su contenido. Es <b>negativa</b> cuando expresa rechazo, enojo, burla o anuncia un hecho perjudicial para la marca.</span>
+      <span><b style="color:#1F2328">Por qué da {{ live.negPct }}:</b> {{ why.a }}</span>
+      <span><b style="color:#1F2328">Matiz:</b> {{ why.b }}</span>
+    </section>
+  </sc-if>
+
+
+
+
+  <div id="ejes" style="scroll-margin-top:70px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px;margin-top:6px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span style="font-family:'Barlow Condensed';font-weight:800;font-size:26px;line-height:1">Los 9 ejes de monitoreo</span>
+      <span style="font-size:12px;color:#5F6670">Tocá un eje para ver el detalle.</span>
+      <div style="display:flex;gap:6px;background:#fff;border-radius:999px;padding:4px;align-self:flex-start">
+        <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+          <button onClick="{{ f.onClick }}" style="border:0;cursor:pointer;border-radius:999px;padding:7px 16px;font-family:'Raleway';font-weight:600;font-size:12px;background:{{ f.bg }};color:{{ f.fg }}">{{ f.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#5F6670;align-items:center">
+      <sc-for list="{{ legend }}" as="l" hint-placeholder-count="5">
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:{{ l.c }}"></span>{{ l.t }}</span>
+      </sc-for>
+    </div>
+  </div>
+
+  <section style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:12px;align-items:start">
+
+    <sc-if value="{{ vis.s1 }}" hint-placeholder-val="{{ true }}"><article onClick="{{ toggle.s1 }}" style="background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(31,35,40,.14)">
+      <div style="background:#ECEDEF;color:#1F2328;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:17px">01 · Marca y controlantes</span><span style="display:flex;align-items:center;gap:8px;flex:none"><span style="background:#fff;color:{{ lv.s1.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s1.t }}</span><span style="font-size:12px;font-weight:700;color:#5F6670;width:14px;text-align:center">{{ chev.s1 }}</span></span></div>
+      <sc-if value="{{ exp.s1 }}" hint-placeholder-val="{{ false }}"><div onClick="{{ toggle.s1 }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);backdrop-filter:blur(3px);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;cursor:default"><div onClick="{{ stop }}" style="width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(31,35,40,.25)"><div style="background:#ECEDEF;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;line-height:1.05">{{ ttl.s1 }}</span><span style="display:flex;align-items:center;gap:8px"><span style="background:#fff;color:{{ lv.s1.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s1.t }}</span><button onClick="{{ toggle.s1 }}" style="border:0;background:#fff;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer">✕</button></span></div><div style="height:3px;background:#7BC47F"></div>
+      <div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;flex:1">
+        <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:35px;line-height:1;color:#1F2328">122</span><span style="font-size:12px;color:#5F6670">menciones cruzadas con controlantes</span></div>
+        <sc-for list="{{ brandBars }}" as="r" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:92px 1fr 34px;gap:8px;align-items:center;font-size:12px"><span style="font-weight:600">{{ r.t }}</span><div style="height:12px;background:#F4F4F2;border-radius:6px;overflow:hidden"><div style="height:100%;width:{{ r.w }}%;background:{{ r.c }};border-radius:6px"></div></div><span style="font-family:'Barlow Condensed';font-weight:700;font-size:14px;text-align:right">{{ r.v }}</span></div>
+        </sc-for>
+        <p style="margin:0;font-size:12px;line-height:1.45;color:#3A4048;text-wrap:pretty">Domina el rescate financiero de Arcor + Danone. Bagley, Pagani y las ON de Mastellone no aparecen.</p>
+      <div style="width:100%;display:flex"><button onClick="{{ open.s1 }}" style="border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:5px 12px;font-family:'Raleway';font-weight:700;font-size:12px;color:#1F2328;cursor:pointer" style-hover="border-color:#7BC47F;color:#3E8E48">Ver términos y publicaciones →</button></div></div></div></div></sc-if>
+    </article></sc-if>
+
+    <sc-if value="{{ vis.s2 }}" hint-placeholder-val="{{ true }}"><article onClick="{{ toggle.s2 }}" style="background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(31,35,40,.14)">
+      <div style="background:#ECEDEF;color:#1F2328;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:17px">02 · Conflicto laboral y despidos</span><span style="display:flex;align-items:center;gap:8px;flex:none"><span style="background:#fff;color:{{ lv.s2.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s2.t }}</span><span style="font-size:12px;font-weight:700;color:#5F6670;width:14px;text-align:center">{{ chev.s2 }}</span></span></div>
+      <sc-if value="{{ exp.s2 }}" hint-placeholder-val="{{ false }}"><div onClick="{{ toggle.s2 }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);backdrop-filter:blur(3px);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;cursor:default"><div onClick="{{ stop }}" style="width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(31,35,40,.25)"><div style="background:#ECEDEF;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;line-height:1.05">{{ ttl.s2 }}</span><span style="display:flex;align-items:center;gap:8px"><span style="background:#fff;color:{{ lv.s2.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s2.t }}</span><button onClick="{{ toggle.s2 }}" style="border:0;background:#fff;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer">✕</button></span></div><div style="height:3px;background:#7BC47F"></div>
+      <div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;flex:1">
+        <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:35px;line-height:1;color:#7BC47F">3</span><span style="font-size:12px;color:#5F6670">menciones de despidos / desvinculaciones</span></div>
+        <div style="display:grid;grid-template-columns:repeat(26,1fr);gap:3px">
+          <sc-for list="{{ people }}" as="d" hint-placeholder-count="130">
+            <span style="aspect-ratio:1;border-radius:50%;background:{{ d.c }}"></span>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px"><span style="display:flex;gap:6px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:#7BC47F"></span>13 desvinculados Frío Sur (Esquel)</span><span style="display:flex;gap:6px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:#DCDFE3"></span>“130 despidos”: 0 menciones</span></div>
+        <p style="margin:0;font-size:12px;line-height:1.45;color:#3A4048;text-wrap:pretty">La cifra de 130 aún no circula. Aparecen reclamos aislados (“rajar a todos sin indemnización”).</p>
+      <div style="width:100%;display:flex"><button onClick="{{ open.s2 }}" style="border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:5px 12px;font-family:'Raleway';font-weight:700;font-size:12px;color:#1F2328;cursor:pointer" style-hover="border-color:#7BC47F;color:#3E8E48">Ver términos y publicaciones →</button></div></div></div></div></sc-if>
+    </article></sc-if>
+
+    <sc-if value="{{ vis.s3 }}" hint-placeholder-val="{{ true }}"><article onClick="{{ toggle.s3 }}" style="background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(31,35,40,.14)">
+      <div style="background:#ECEDEF;color:#1F2328;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:17px">03 · Reestructuración logística</span><span style="display:flex;align-items:center;gap:8px;flex:none"><span style="background:#fff;color:{{ lv.s3.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s3.t }}</span><span style="font-size:12px;font-weight:700;color:#5F6670;width:14px;text-align:center">{{ chev.s3 }}</span></span></div>
+      <sc-if value="{{ exp.s3 }}" hint-placeholder-val="{{ false }}"><div onClick="{{ toggle.s3 }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);backdrop-filter:blur(3px);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;cursor:default"><div onClick="{{ stop }}" style="width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(31,35,40,.25)"><div style="background:#ECEDEF;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;line-height:1.05">{{ ttl.s3 }}</span><span style="display:flex;align-items:center;gap:8px"><span style="background:#fff;color:{{ lv.s3.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s3.t }}</span><button onClick="{{ toggle.s3 }}" style="border:0;background:#fff;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer">✕</button></span></div><div style="height:3px;background:#7BC47F"></div>
+      <div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;flex:1">
+        <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:35px;line-height:1;color:#3E8E48">2</span><span style="font-size:12px;color:#5F6670">narrativas logísticas activas</span></div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:6px;text-align:center">
+          <div style="background:#F1F2F4;border-radius:10px;padding:10px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:14px;color:#3A4048">Planta</span><span style="font-size:12px;color:#5F6670">Gral. Rodríguez</span></div>
+          <span style="color:#5F6670;font-weight:700">→</span>
+          <div style="background:#EAF6EA;border:2px dashed #7BC47F;border-radius:10px;padding:8px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:14px;color:#7BC47F">Distribuidor ✕</span><span style="font-size:12px;color:#5F6670">Frío Sur</span></div>
+          <span style="color:#5F6670;font-weight:700">→</span>
+          <div style="background:#EAF6EA;border-radius:10px;padding:10px 6px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:14px;color:#3E8E48">Góndola</span><span style="font-size:12px;color:#5F6670">faltantes Chubut</span></div>
+        </div>
+        <p style="margin:0;font-size:12px;line-height:1.45;color:#3A4048;text-wrap:pretty">“Costos logísticos” entra por el balance (Infobae). Tercerización, cierre de depósitos y flota propia: sin menciones.</p>
+      <div style="width:100%;display:flex"><button onClick="{{ open.s3 }}" style="border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:5px 12px;font-family:'Raleway';font-weight:700;font-size:12px;color:#1F2328;cursor:pointer" style-hover="border-color:#7BC47F;color:#3E8E48">Ver términos y publicaciones →</button></div></div></div></div></sc-if>
+    </article></sc-if>
+
+    <sc-if value="{{ vis.s4 }}" hint-placeholder-val="{{ true }}"><article onClick="{{ toggle.s4 }}" style="background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(31,35,40,.14)">
+      <div style="background:#ECEDEF;color:#1F2328;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:17px">04 · Sindicatos y dirigentes</span><span style="display:flex;align-items:center;gap:8px;flex:none"><span style="background:#fff;color:{{ lv.s4.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s4.t }}</span><span style="font-size:12px;font-weight:700;color:#5F6670;width:14px;text-align:center">{{ chev.s4 }}</span></span></div>
+      <sc-if value="{{ exp.s4 }}" hint-placeholder-val="{{ false }}"><div onClick="{{ toggle.s4 }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);backdrop-filter:blur(3px);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;cursor:default"><div onClick="{{ stop }}" style="width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(31,35,40,.25)"><div style="background:#ECEDEF;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;line-height:1.05">{{ ttl.s4 }}</span><span style="display:flex;align-items:center;gap:8px"><span style="background:#fff;color:{{ lv.s4.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s4.t }}</span><button onClick="{{ toggle.s4 }}" style="border:0;background:#fff;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer">✕</button></span></div><div style="height:3px;background:#7BC47F"></div>
+      <div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;flex:1">
+        <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:35px;line-height:1;color:#1F2328">2</span><span style="font-size:12px;color:#5F6670">posteos con actores gremiales</span></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <sc-for list="{{ unions }}" as="u" hint-placeholder-count="3">
+            <div style="background:#F6F7F8;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5F6670">{{ u.g }}</span>
+              <sc-for list="{{ u.items }}" as="a" hint-placeholder-count="3">
+                <div style="display:flex;justify-content:space-between;gap:4px;font-size:12px"><span style="color:{{ a.fg }};font-weight:{{ a.fw }}">{{ a.t }}</span><span style="font-family:'Barlow Condensed';font-weight:700;color:{{ a.fg }}">{{ a.v }}</span></div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:12px;line-height:1.45;color:#3A4048;text-wrap:pretty">Solo voces propias de ATILRA (Heber Ríos con Portería de Mastellone). Camioneros/Moyano y CGT: silencio.</p>
+      <div style="width:100%;display:flex"><button onClick="{{ open.s4 }}" style="border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:5px 12px;font-family:'Raleway';font-weight:700;font-size:12px;color:#1F2328;cursor:pointer" style-hover="border-color:#7BC47F;color:#3E8E48">Ver términos y publicaciones →</button></div></div></div></div></sc-if>
+    </article></sc-if>
+
+    <sc-if value="{{ vis.s5 }}" hint-placeholder-val="{{ true }}"><article onClick="{{ toggle.s5 }}" style="background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(31,35,40,.14)">
+      <div style="background:#ECEDEF;color:#1F2328;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:17px">05 · Acción sindical · escalada</span><span style="display:flex;align-items:center;gap:8px;flex:none"><span style="background:#fff;color:{{ lv.s5.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s5.t }}</span><span style="font-size:12px;font-weight:700;color:#5F6670;width:14px;text-align:center">{{ chev.s5 }}</span></span></div>
+      <sc-if value="{{ exp.s5 }}" hint-placeholder-val="{{ false }}"><div onClick="{{ toggle.s5 }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);backdrop-filter:blur(3px);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;cursor:default"><div onClick="{{ stop }}" style="width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(31,35,40,.25)"><div style="background:#ECEDEF;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;line-height:1.05">{{ ttl.s5 }}</span><span style="display:flex;align-items:center;gap:8px"><span style="background:#fff;color:{{ lv.s5.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s5.t }}</span><button onClick="{{ toggle.s5 }}" style="border:0;background:#fff;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer">✕</button></span></div><div style="height:3px;background:#7BC47F"></div>
+      <div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;flex:1">
+        <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:35px;line-height:1;color:#1F2328">0</span><span style="font-size:12px;color:#5F6670">medidas de fuerza en curso</span></div>
+        <div style="display:flex;flex-direction:column-reverse;gap:4px">
+          <sc-for list="{{ ladder }}" as="s" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:10px"><div style="height:22px;width:{{ s.w }}%;background:{{ s.c }};border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:12px;font-weight:700;color:{{ s.fg }};white-space:nowrap">{{ s.t }}</div><span style="font-size:12px;color:#5F6670">{{ s.note }}</span></div>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:12px;line-height:1.45;color:#3A4048;text-wrap:pretty">Único eco: memoria del conflicto de la planta de Longchamps. Umbral de alerta: primera asamblea o “estado de alerta”.</p>
+      <div style="width:100%;display:flex"><button onClick="{{ open.s5 }}" style="border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:5px 12px;font-family:'Raleway';font-weight:700;font-size:12px;color:#1F2328;cursor:pointer" style-hover="border-color:#7BC47F;color:#3E8E48">Ver términos y publicaciones →</button></div></div></div></div></sc-if>
+    </article></sc-if>
+
+    <sc-if value="{{ vis.s6 }}" hint-placeholder-val="{{ true }}"><article onClick="{{ toggle.s6 }}" style="background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(31,35,40,.14)">
+      <div style="background:#ECEDEF;color:#1F2328;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:17px">06 · Crisis del sector lácteo</span><span style="display:flex;align-items:center;gap:8px;flex:none"><span style="background:#fff;color:{{ lv.s6.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s6.t }}</span><span style="font-size:12px;font-weight:700;color:#5F6670;width:14px;text-align:center">{{ chev.s6 }}</span></span></div>
+      <sc-if value="{{ exp.s6 }}" hint-placeholder-val="{{ false }}"><div onClick="{{ toggle.s6 }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);backdrop-filter:blur(3px);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;cursor:default"><div onClick="{{ stop }}" style="width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(31,35,40,.25)"><div style="background:#ECEDEF;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;line-height:1.05">{{ ttl.s6 }}</span><span style="display:flex;align-items:center;gap:8px"><span style="background:#fff;color:{{ lv.s6.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s6.t }}</span><button onClick="{{ toggle.s6 }}" style="border:0;background:#fff;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer">✕</button></span></div><div style="height:3px;background:#7BC47F"></div>
+      <div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;flex:1">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:#EAF6EA;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:27px;line-height:1;color:#7BC47F">$4.791M</span><span style="font-size:12px;color:#3A4048">pérdida neta 1S 2026 · <b>x4</b> interanual</span></div>
+          <div style="background:#ECEDEF;color:#1F2328;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:27px;line-height:1;color:#7BC47F">41</span><span style="font-size:12px">menciones del rumor de quiebra (14/09)</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;color:#1F2328">25</span><span style="line-height:1.35">menciones de <b>SanCor</b>: el espejo “así terminan las lácteas” ya está instalado</span></div>
+        <p style="margin:0;font-size:12px;line-height:1.45;color:#3A4048;text-wrap:pretty">COPAL y la ruptura de la cadena de pagos (31/08) suman contexto de crisis de consumo.</p>
+      <div style="width:100%;display:flex"><button onClick="{{ open.s6 }}" style="border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:5px 12px;font-family:'Raleway';font-weight:700;font-size:12px;color:#1F2328;cursor:pointer" style-hover="border-color:#7BC47F;color:#3E8E48">Ver términos y publicaciones →</button></div></div></div></div></sc-if>
+    </article></sc-if>
+
+    <sc-if value="{{ vis.s7 }}" hint-placeholder-val="{{ true }}"><article onClick="{{ toggle.s7 }}" style="background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(31,35,40,.14)">
+      <div style="background:#ECEDEF;color:#1F2328;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:17px">07 · Geografía y activos</span><span style="display:flex;align-items:center;gap:8px;flex:none"><span style="background:#fff;color:{{ lv.s7.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s7.t }}</span><span style="font-size:12px;font-weight:700;color:#5F6670;width:14px;text-align:center">{{ chev.s7 }}</span></span></div>
+      <sc-if value="{{ exp.s7 }}" hint-placeholder-val="{{ false }}"><div onClick="{{ toggle.s7 }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);backdrop-filter:blur(3px);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;cursor:default"><div onClick="{{ stop }}" style="width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(31,35,40,.25)"><div style="background:#ECEDEF;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;line-height:1.05">{{ ttl.s7 }}</span><span style="display:flex;align-items:center;gap:8px"><span style="background:#fff;color:{{ lv.s7.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s7.t }}</span><button onClick="{{ toggle.s7 }}" style="border:0;background:#fff;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer">✕</button></span></div><div style="height:3px;background:#7BC47F"></div>
+      <div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;flex:1">
+        <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:35px;line-height:1;color:#1F2328">12</span><span style="font-size:12px;color:#5F6670">menciones geolocalizadas</span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px">
+          <sc-for list="{{ places }}" as="g" hint-placeholder-count="7">
+            <div style="border-radius:10px;padding:8px 10px;background:{{ g.bg }};display:flex;flex-direction:column;gap:0"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:19px;line-height:1;color:{{ g.fg }}">{{ g.v }}</span><span style="font-size:12px;font-weight:600;color:#1F2328">{{ g.t }}</span><span style="font-size:11px;color:#5F6670">{{ g.p }}</span></div>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:12px;line-height:1.45;color:#3A4048;text-wrap:pretty">General Rodríguez y el Complejo Pascual Mastellone: 0. El foco territorial hoy es la Patagonia (Frío Sur).</p>
+      <div style="width:100%;display:flex"><button onClick="{{ open.s7 }}" style="border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:5px 12px;font-family:'Raleway';font-weight:700;font-size:12px;color:#1F2328;cursor:pointer" style-hover="border-color:#7BC47F;color:#3E8E48">Ver términos y publicaciones →</button></div></div></div></div></sc-if>
+    </article></sc-if>
+
+    <sc-if value="{{ vis.s8 }}" hint-placeholder-val="{{ true }}"><article onClick="{{ toggle.s8 }}" style="background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(31,35,40,.14)">
+      <div style="background:#ECEDEF;color:#1F2328;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:17px">08 · Sentimiento y reputación</span><span style="display:flex;align-items:center;gap:8px;flex:none"><span style="background:#fff;color:{{ lv.s8.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s8.t }}</span><span style="font-size:12px;font-weight:700;color:#5F6670;width:14px;text-align:center">{{ chev.s8 }}</span></span></div>
+      <sc-if value="{{ exp.s8 }}" hint-placeholder-val="{{ false }}"><div onClick="{{ toggle.s8 }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);backdrop-filter:blur(3px);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;cursor:default"><div onClick="{{ stop }}" style="width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(31,35,40,.25)"><div style="background:#ECEDEF;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;line-height:1.05">{{ ttl.s8 }}</span><span style="display:flex;align-items:center;gap:8px"><span style="background:#fff;color:{{ lv.s8.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s8.t }}</span><button onClick="{{ toggle.s8 }}" style="border:0;background:#fff;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer">✕</button></span></div><div style="height:3px;background:#7BC47F"></div>
+      <div style="padding:16px 18px 18px;display:flex;gap:16px;flex:1;flex-wrap:wrap;align-items:center">
+        <div style="position:relative;width:104px;height:104px;flex:none">
+          <svg viewBox="0 0 42 42" width="104" height="104" style="transform:rotate(-90deg)">
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#E5484D" stroke-width="6" stroke-dasharray="{{ tone.negDash }}" stroke-dashoffset="0"></circle>
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#AEB4BB" stroke-width="6" stroke-dasharray="{{ tone.neuDash }}" stroke-dashoffset="{{ tone.neuOff }}"></circle>
+            <circle cx="21" cy="21" r="15.9" fill="none" stroke="#7BC47F" stroke-width="6" stroke-dasharray="{{ tone.posDash }}" stroke-dashoffset="{{ tone.posOff }}"></circle>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:24px;line-height:1;color:#C8363B">{{ live.negPct }}</span><span style="font-size:11px;color:#5F6670">negativo</span></div>
+        </div>
+        <div style="flex:1 1 180px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;line-height:1.4;color:#3A4048">
+            <span style="display:flex;gap:8px;align-items:flex-start"><span style="width:9px;height:9px;border-radius:50%;background:#E5484D;flex:none;margin-top:4px"></span><span><b style="color:#C8363B">Negativo · {{ tone.neg }} ({{ tone.negPct }})</b> — expresa rechazo, enojo o burla, o anuncia un hecho perjudicial para la marca.</span></span>
+            <span style="display:flex;gap:8px;align-items:flex-start"><span style="width:9px;height:9px;border-radius:50%;background:#AEB4BB;flex:none;margin-top:4px"></span><span><b style="color:#1F2328">Neutro · {{ tone.neu }} ({{ tone.neuPct }})</b> — informa o menciona la marca sin valoración: noticias, datos, preguntas.</span></span>
+            <span style="display:flex;gap:8px;align-items:flex-start"><span style="width:9px;height:9px;border-radius:50%;background:#7BC47F;flex:none;margin-top:4px"></span><span><b style="color:#3E8E48">Positivo · {{ tone.pos }} ({{ tone.posPct }})</b> — defiende, elogia o respalda a la marca o a sus productos.</span></span>
+          </div>
+        </div>
+        <div style="flex:1 1 100%;display:flex;flex-direction:column;gap:8px;border-top:1px solid #E5E7EA;padding-top:14px">
+          <span style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5F6670">Frases negativas más repetidas</span>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ quotes }}" as="q" hint-placeholder-count="3">
+            <span style="background:#FDECEC;color:#A12A2F;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:600">“{{ q }}”</span>
+          </sc-for>
+          </div>
+          <span style="font-size:12px;color:#3A4048">Boicot / “dejar de comprar”: <b>0</b>. El enojo apunta al Gobierno, no a la marca.</span>
+        </div>
+      <div style="width:100%;display:flex"><button onClick="{{ open.s8 }}" style="border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:5px 12px;font-family:'Raleway';font-weight:700;font-size:12px;color:#1F2328;cursor:pointer" style-hover="border-color:#7BC47F;color:#3E8E48">Ver términos y publicaciones →</button></div></div></div></div></sc-if>
+    </article></sc-if>
+
+    <sc-if value="{{ vis.s9 }}" hint-placeholder-val="{{ true }}"><article onClick="{{ toggle.s9 }}" style="background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column" style-hover="box-shadow:0 8px 24px rgba(31,35,40,.14)">
+      <div style="background:#ECEDEF;color:#1F2328;padding:9px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:17px">09 · Amplificadores externos</span><span style="display:flex;align-items:center;gap:8px;flex:none"><span style="background:#fff;color:{{ lv.s9.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s9.t }}</span><span style="font-size:12px;font-weight:700;color:#5F6670;width:14px;text-align:center">{{ chev.s9 }}</span></span></div>
+      <sc-if value="{{ exp.s9 }}" hint-placeholder-val="{{ false }}"><div onClick="{{ toggle.s9 }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);backdrop-filter:blur(3px);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px;cursor:default"><div onClick="{{ stop }}" style="width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(31,35,40,.25)"><div style="background:#ECEDEF;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;line-height:1.05">{{ ttl.s9 }}</span><span style="display:flex;align-items:center;gap:8px"><span style="background:#fff;color:{{ lv.s9.c }};border-radius:999px;padding:2px 10px;font-weight:700;font-size:12px">{{ lv.s9.t }}</span><button onClick="{{ toggle.s9 }}" style="border:0;background:#fff;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer">✕</button></span></div><div style="height:3px;background:#7BC47F"></div>
+      <div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px;flex:1">
+        <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:35px;line-height:1;color:#1F2328">0</span><span style="font-size:12px;color:#5F6670">menciones de actores institucionales</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ tags }}" as="h" hint-placeholder-count="6">
+            <span style="border-radius:999px;padding:5px 11px;font-size:12px;font-weight:600;background:{{ h.bg }};color:{{ h.fg }}">{{ h.t }} · {{ h.v }}</span>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ institutions }}" as="i" hint-placeholder-count="5">
+            <span style="border:1px dashed #AEB4BB;border-radius:8px;padding:4px 9px;font-size:12px;color:#5F6670">{{ i }} · 0</span>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:12px;line-height:1.45;color:#3A4048;text-wrap:pretty">Solo #LaSerenisima tracciona. Politización vía #gobiernoCriminal y #Milei, sin legisladores ni Trabajo.</p>
+      <div style="width:100%;display:flex"><button onClick="{{ open.s9 }}" style="border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:5px 12px;font-family:'Raleway';font-weight:700;font-size:12px;color:#1F2328;cursor:pointer" style-hover="border-color:#7BC47F;color:#3E8E48">Ver términos y publicaciones →</button></div></div></div></div></sc-if>
+    </article></sc-if>
+  </section>
+
+  <section id="publicaciones" style="scroll-margin-top:70px;background:#fff;border-radius:16px;padding:14px 20px;display:flex;flex-direction:column;gap:12px">
+    <button onClick="{{ togglePosts }}" style="border:0;background:transparent;padding:0;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;font-family:'Raleway';color:#1F2328;text-align:left"><span style="font-family:'Barlow Condensed';font-weight:700;font-size:21px">Publicaciones con mayor interacción</span><span style="font-size:12px;font-weight:700;color:#5F6670">{{ postsChev }}</span></button>
+    <sc-if value="{{ showPosts }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column">
+      <sc-for list="{{ topPosts }}" as="p" hint-placeholder-count="6">
+        <a href="{{ p.url }}" target="_blank" style="display:grid;grid-template-columns:60px 1fr auto;gap:14px;align-items:center;padding:12px 0;border-top:1px solid #E5E7EA;text-decoration:none;color:#1F2328">
+          <span style="font-family:'Barlow Condensed';font-weight:700;font-size:12px;color:#5F6670">{{ p.d }}</span>
+          <span style="display:flex;flex-direction:column;gap:3px;min-width:0"><span style="font-size:12px;font-weight:700;color:{{ p.sc }}">@{{ p.h }} · {{ p.pl }}</span><span style="font-size:12px;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{ p.txt }}</span></span>
+          <span style="display:flex;flex-direction:column;align-items:flex-end"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:18px;line-height:1">{{ p.eng }}</span><span style="font-size:11px;color:#5F6670">interacc.</span></span>
+        </a>
+      </sc-for>
+    </div></sc-if>
+  </section>
+
+  <footer style="font-size:12px;color:#5F6670;line-height:1.5">Fuente: monitoreo de redes sociales (X, Instagram, TikTok; excluye reposts y contenido comercial). Período 25/08–24/09/2026. Conteos por eje con keyword matching dentro de la búsqueda; niveles de riesgo asignados por el equipo de análisis.</footer>
+</main>
+
+<sc-if value="{{ showChart }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeChart }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);backdrop-filter:blur(3px);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div onClick="{{ stop }}" style="width:min(960px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:20px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 60px rgba(31,35,40,.25)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <span style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5F6670">Menciones de La Serenísima</span>
+        <button onClick="{{ closeChart }}" style="border:0;background:#ECEDEF;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer">✕</button>
+      </div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center">
+      <div style="display:flex;flex-direction:column">
+        <span style="font-family:'Barlow Condensed';font-weight:700;font-size:21px">Menciones diarias de La Serenísima</span>
+        <span style="font-size:12px;color:#5F6670">{{ hoverLabel }}</span>
+      </div>
+      <div style="display:flex;gap:6px;background:#F4F4F2;border-radius:999px;padding:4px">
+        <sc-for list="{{ periods }}" as="p" hint-placeholder-count="3">
+          <button onClick="{{ p.onClick }}" style="border:0;cursor:pointer;border-radius:999px;padding:7px 16px;font-family:'Raleway';font-weight:600;font-size:12px;background:{{ p.bg }};color:{{ p.fg }}">{{ p.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="position:relative;height:170px;display:flex;align-items:flex-end;gap:3px;border-bottom:2px solid #1F2328;padding-top:20px" onMouseLeave="{{ clearHover }}">
+      <sc-for list="{{ bars }}" as="b" hint-placeholder-count="30">
+        <div onMouseEnter="{{ b.onEnter }}" onClick="{{ b.onClick }}" style="flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:pointer;position:relative">
+          <sc-if value="{{ b.showNote }}" hint-placeholder-val="{{ false }}">
+            <span style="position:absolute;bottom:calc({{ b.h }}% + 6px);font-family:'Barlow Condensed';font-weight:700;font-size:12px;color:{{ b.color }};white-space:nowrap">{{ b.v }}</span>
+          </sc-if>
+          <div style="width:100%;height:{{ b.h }}%;min-height:2px;background:{{ b.color }};border-radius:4px 4px 0 0;opacity:{{ b.op }}"></div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:#5F6670;margin-top:-6px">
+      <span>{{ axis.start }}</span><span>{{ axis.end }}</span>
+    </div>
+    <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
+        <sc-for list="{{ notes }}" as="nt" hint-placeholder-count="3"><div style="display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.4"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:14px;color:{{ nt.c }};flex:none">{{ nt.d }}</span><span>{{ nt.t }}</span></div></sc-for>
+      </div>
+    </sc-if>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ hasDay }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeDay }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);z-index:40;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div onClick="{{ stop }}" style="width:min(560px,100%);max-height:80vh;overflow:auto;background:#fff;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 24px 60px rgba(31,35,40,.3)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5F6670">Menciones del día</span>
+          <span style="font-family:'Barlow Condensed';font-weight:800;font-size:24px;line-height:1.05">{{ day.d }} · <span style="color:#7BC47F">{{ day.v }}</span> menciones</span>
+        </div>
+        <button onClick="{{ closeDay }}" style="border:0;background:#ECEDEF;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer;flex:none">✕</button>
+      </div>
+      <span style="font-size:12px;color:#5F6670">{{ day.note }}</span>
+      <div ref="{{ kpiRef }}" style="display:flex;flex-direction:column;gap:8px;margin-top:{{ kpiOffset }}px">
+        <sc-for list="{{ day.posts }}" as="p" hint-placeholder-count="3">
+          <a href="{{ p.url }}" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:12px;background:#F6F7F8;text-decoration:none;color:#1F2328">
+            <span style="font-size:12px;font-weight:700;color:{{ p.sc }}">@{{ p.h }} · {{ p.pl }} · {{ p.eng }} interacc.</span>
+            <span style="font-size:12px;line-height:1.45">{{ p.txt }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ showRisk }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeRisk }}" style="position:fixed;inset:0;background:rgba(31,35,40,.35);backdrop-filter:blur(3px);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div onClick="{{ stop }}" style="width:min(720px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:20px;padding:20px 22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 60px rgba(31,35,40,.25)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <span style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5F6670">Conocé un poco más</span>
+        <button onClick="{{ closeRisk }}" style="border:0;background:#ECEDEF;color:#1F2328;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:700;cursor:pointer">✕</button>
+      </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:18px 24px">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="width:14px;height:14px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 5px rgba(123,196,127,.25)"></span>
+        <span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;letter-spacing:.03em;line-height:1">RIESGO REPUTACIONAL: MODERADO</span>
+      </div>
+      <p style="margin:0;font-size:12px;line-height:1.5;opacity:.9;text-wrap:pretty"><b>Qué medimos:</b> la probabilidad de que la conversación en redes sobre despidos y reestructuración logística de La Serenísima escale a una <b>crisis de reputación de la marca</b> (boicot, conflicto gremial visible o intervención política).</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
+        <div style="display:flex;flex-direction:column;gap:5px"><div style="height:8px;border-radius:4px;background:#BFE3C0"></div><span style="font-size:12px;opacity:.7">Bajo</span></div>
+        <div style="display:flex;flex-direction:column;gap:5px"><div style="height:8px;border-radius:4px;background:#7BC47F;box-shadow:0 0 0 3px rgba(123,196,127,.35)"></div><span style="font-size:12px;font-weight:700;color:#7BC47F">Moderado</span></div>
+        <div style="display:flex;flex-direction:column;gap:5px"><div style="height:8px;border-radius:4px;background:#DCDFE3"></div><span style="font-size:12px;opacity:.7">Alto</span></div>
+        <div style="display:flex;flex-direction:column;gap:5px"><div style="height:8px;border-radius:4px;background:#DCDFE3"></div><span style="font-size:12px;opacity:.7">Crítico</span></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+    <p style="margin:0;font-size:13px;line-height:1.5;text-wrap:pretty"><b style="color:#7BC47F">Por qué moderado:</b> El pico del <b>14/09</b> (41 menciones, 458 mil vistas) lo generó un <b>rumor falso de quiebra</b> que confundió a La Serenísima con SanCor y se politizó. El conflicto de despidos y la reestructuración logística <b>todavía no escalan</b>: sin paros, sin ATILRA/Camioneros en agenda y sin llamados a boicot.</p>
+    <p style="margin:0;font-size:12px;line-height:1.5;opacity:.9;text-wrap:pretty"><b>Qué lo subiría a Alto:</b> que circule la cifra de 130 despidos, que Camioneros o ATILRA anuncien medidas de fuerza, o que aparezcan llamados a dejar de comprar la marca.</p>
+    </div>
+  </div>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ close }}" style="position:fixed;inset:0;background:rgba(31,35,40,.45);z-index:20;display:flex;justify-content:flex-end">
+    <aside onClick="{{ stop }}" style="width:min(520px,100%);height:100%;background:#fff;overflow:auto;display:flex;flex-direction:column">
+      <div style="background:#ECEDEF;color:#1F2328;padding:18px 22px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.85">Eje {{ sel.n }}</span><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;line-height:1.05">{{ sel.title }}</span></div>
+        <button onClick="{{ close }}" style="border:0;background:#fff;color:#1F2328;border-radius:999px;width:36px;height:36px;font-size:14px;font-weight:700;cursor:pointer;flex:none">✕</button>
+      </div>
+      <div style="height:4px;background:#7BC47F"></div>
+      <div style="padding:14px 16px;display:flex;flex-direction:column;gap:18px">
+        <p style="margin:0;font-size:12px;line-height:1.5;text-wrap:pretty">{{ sel.read }}</p>
+        <div ref="{{ kpiRef }}" style="display:flex;flex-direction:column;gap:8px;margin-top:{{ kpiOffset }}px">
+          <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#5F6670">Términos monitoreados</span>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <sc-for list="{{ sel.terms }}" as="t" hint-placeholder-count="8">
+              <span style="border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;background:{{ t.bg }};color:{{ t.fg }}">{{ t.t }} · {{ t.v }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <div ref="{{ kpiRef }}" style="display:flex;flex-direction:column;gap:8px;margin-top:{{ kpiOffset }}px">
+          <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#5F6670">Publicaciones del eje</span>
+          <sc-if value="{{ sel.empty }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#5F6670">Sin publicaciones en el período.</span></sc-if>
+          <sc-for list="{{ sel.posts }}" as="p" hint-placeholder-count="3">
+            <a href="{{ p.url }}" target="_blank" style="display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:12px;background:#F6F7F8;text-decoration:none;color:#1F2328">
+              <span style="font-size:12px;font-weight:700;color:{{ p.sc }}">{{ p.d }} · @{{ p.h }} · {{ p.pl }} · {{ p.eng }} interacc.</span>
+              <span style="font-size:12px;line-height:1.45">{{ p.txt }}</span>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+    </aside>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultPeriod&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;7d&quot;,&quot;14d&quot;,&quot;30d&quot;],&quot;default&quot;:&quot;30d&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showAnnotations&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+let DAILY=[5,4,7,5,0,1,3,6,11,5,7,4,0,5,2,2,3,6,5,4,41,5,1,2,4,2,0,2,3,2,0];
+let START=new Date(2026,7,25);let LIVE={updatedAt:'2026-09-24T18:28:30.038Z',total:147,neg:41,pos:7,x:116,ig:32,tt:0};
+const G='#AEB4BB',R='#7BC47F',O='#BFE3C0',K='#1F2328';
+const LV=[{t:'Sin señal',c:'#5F6670'},{t:'Latente',c:'#3A4048'},{t:'Bajo',c:'#5F6670'},{t:'Medio',c:'#3E8E48'},{t:'Alto',c:R}];
+let POSTS=[
+{id:17,d:'23/09',h:'infogremialesok',pl:'IG',s:'neu',eng:2,s_:[3,6],url:'https://www.instagram.com/p/DdoedN-iXbz/',txt:'Friosur, distribuidor de La Serenísima en la Patagonia, formalizó la apertura de su concurso de acreedores. Atribuye la crisis a la retracción del consumo y el aumento de costos. (47 mil de alcance)'},
+{id:18,d:'23/09',h:'burkhardtjm',pl:'X',s:'neg',eng:0,s_:[7],url:'https://x.com/BurkhardtJm/status/2102782674066923652',txt:'Que alguien investigue la red de cloacas de General Rodríguez; La Serenísima es nuestra Umbrella Corporation.'},
+{id:1,d:'14/09',h:'moburx2',pl:'X',s:'neg',eng:6632,s_:[6,8],url:'https://x.com/moburx2/status/2099290441279488266',txt:'La Serenísima declaró quiebra y cierra a fin de mes. Gobierno de inútiles.'},
+{id:2,d:'31/08',h:'lolariemucho',pl:'X',s:'neg',eng:1244,s_:[6],url:'https://x.com/lolariemucho/status/2094426859479937282',txt:'Se derrumba el consumo y se rompe la cadena de pago. COPAL: Coca Cola, Danone, Unilever, Molinos, La Serenísima y Mondelez advierten que los súper les pidieron que no les envíen más mercadería.'},
+{id:3,d:'11/09',h:'abcdiarioar',pl:'Instagram',s:'neu',eng:394,s_:[2,3,7],url:'https://www.instagram.com/reel/DdKNxn3CRF5/',txt:'¿Qué pasa con La Serenísima en Chubut? Frío Sur, distribuidora de Mastellone y Danone, cerró en Esquel tras perder la distribución oficial: 13 trabajadores desvinculados y alertas de abastecimiento en Chubut y Santa Cruz.'},
+{id:4,d:'02/09',h:'infobae',pl:'X',s:'neg',eng:293,s_:[3,6],url:'https://x.com/infobae/status/2095248512522875309',txt:'La Serenísima multiplicó por cuatro sus pérdidas en un año por la fuerte caída del consumo y los costos logísticos.'},
+{id:5,d:'27/08',h:'iprofesional',pl:'Instagram',s:'neu',eng:269,s_:[1],url:'https://www.instagram.com/reel/DcjtShAj4zR/',txt:'Arcor y Danone avanzan con un plan de rescate financiero para Mastellone. #Mastellone #Arcor #Danone #IndustriaLáctea'},
+{id:6,d:'01/09',h:'mdzol',pl:'Instagram',s:'neu',eng:206,s_:[7],url:'https://www.instagram.com/p/DcvF9RqoMCW/',txt:'Los “Chachos” ganan terreno en La Rioja: 1.422 comercios adheridos, incluyendo Coca-Cola, La Serenísima y Arcor.'},
+{id:7,d:'02/09',h:'jorrausch',pl:'X',s:'neg',eng:117,s_:[6,8,9],url:'https://x.com/JorRausch/status/2095274863652938213',txt:'Efectos duros sufre otra empresa por las políticas de #Milei: La Serenísima multiplicó por cuatro sus pérdidas.'},
+{id:8,d:'05/09',h:'heberjrios',pl:'Instagram',s:'pos',eng:83,s_:[4],url:'https://www.instagram.com/p/Dc6VNcADvgF/',txt:'Anoche con los compañeros trabajadores de Portería de Mastellone Hnos. Truco, asado y charlas que dan fuerzas para todo lo que se venga.'},
+{id:9,d:'03/09',h:'juninpopular',pl:'Instagram',s:'neg',eng:52,s_:[6],url:'https://www.instagram.com/p/Dc1_F1gFl07/',txt:'Mastellone Hermanos cerró el primer semestre de 2026 con pérdidas por $4.791 millones.'},
+{id:10,d:'15/09',h:'leito_bahiense',pl:'X',s:'neg',eng:27,s_:[6,8],url:'https://x.com/Leito_bahiense/status/2099655968741265603',txt:'La Serenísima declaró quiebra y cierra a fin de mes. Gobierno de inútiles. El yogur está 3.5 dólares.'},
+{id:11,d:'18/09',h:'omarplaini53',pl:'Instagram',s:'neu',eng:18,s_:[4,5],url:'https://www.instagram.com/p/DdcmZIQuYER/',txt:'Me reuní con los compañeros de Atilra Longchamps: la historia de lucha del conflicto laboral de la planta de La Serenísima, asambleas a pie de planta.'},
+{id:12,d:'14/09',h:'pyanez1968',pl:'X',s:'neg',eng:11,s_:[1],url:'https://x.com/pyanez1968/status/2099327045876494512',txt:'A La Serenísima la compró Arcor y Danone hace 4 meses.'},
+{id:13,d:'14/09',h:'danielcantale',pl:'X',s:'neg',eng:8,s_:[6],url:'https://x.com/DanielCantale/status/2099484800478294301',txt:'Sancor y La Serenísima, esta última con nuevo management de Danone, en la quiebra. Argentina es una trampa.'},
+{id:14,d:'14/09',h:'marita091979',pl:'X',s:'neg',eng:4,s_:[8,9],url:'https://x.com/marita091979/status/2099608701589930447',txt:'La Serenísima declaró quiebra y cierra a fin de mes. #gobiernoCriminal'},
+{id:15,d:'14/09',h:'brofeladenok',pl:'X',s:'neg',eng:0,s_:[2,8],url:'https://x.com/brofeladenok/status/2099460018198220857',txt:'…los ayudan a rajar a todos sin indemnización y sueldos de miseria. Hay que dársela a los trabajadores.'},
+{id:16,d:'14/09',h:'aliciasoe',pl:'X',s:'neu',eng:1,s_:[6],url:'https://x.com/AliciaSoe/status/2099500251111424393',txt:'La Serenísima tiene problemas financieros por la crisis de consumo, pero no quebró ni cierra. La que pidió quiebra fue Sancor.'}
+];
+const NOTES=[{d:'14/09',t:'Rumor viral “La Serenísima declaró quiebra” (@moburx2, 6,6 mil interacciones). Desmentido por usuarios: la quiebra fue de SanCor.'},{d:'02/09',t:'Infobae: pérdidas x4 “por caída del consumo y costos logísticos”. Se replica en clave anti-gobierno.'},{d:'11/09',t:'Frío Sur pierde la distribución en Patagonia: 13 desvinculados y faltantes en góndolas de Esquel.'}];
+let SECS={
+s1:{n:'01',title:'Marca, empresa y controlantes',lv:3,read:'La conversación sobre controlantes gira en torno al rescate financiero de Arcor y Danone sobre Mastellone. Es neutra-informativa y funciona como marco: cualquier despido se leerá como “decisión de las multinacionales”.',terms:[['Arcor',52],['La Serenísima',47],['Danone',41],['Mastellone',29],['Grupo Arcor',6],['Bagley',0],['Pagani',0],['CNV / ON Mastellone',0]]},
+s2:{n:'02',title:'Conflicto laboral y despidos',lv:1,read:'Solo 3 menciones de despidos. El dato concreto son los 13 desvinculados de Frío Sur (distribuidor, no Mastellone). La cifra de 130 despidos no apareció aún: es el principal detonante a vigilar.',terms:[['despidos',2],['desvinculados',1],['130 despidos',0],['130 familias',0],['telegramas',0],['suspensiones',0],['vaciamiento',0],['retiros voluntarios',0]]},
+s3:{n:'03',title:'Reestructuración logística',lv:2,read:'Dos narrativas: (1) “costos logísticos” como causa de pérdidas, vía Infobae; (2) la caída de Frío Sur y faltantes en Patagonia. Aún no se vincula con tercerización ni con la flota propia.',terms:[['costos logísticos',4],['Frío Sur / distribución',1],['abastecimiento',1],['tercerización',0],['cierre de depósito',0],['camiones propios',0],['reparto',0]]},
+s4:{n:'04',title:'Sindicatos y dirigentes',lv:1,read:'Presencia gremial mínima y en tono de pertenencia (Heber Ríos, ATILRA Longchamps). Camioneros no está en la conversación: su entrada sería la señal de salto a escala nacional.',terms:[['Heber Ríos',1],['ATILRA',1],['Héctor “Etín” Ponce',0],['OSPIL',0],['Camioneros',0],['Moyano',0],['CGT',0]]},
+s5:{n:'05',title:'Repertorio de acción sindical',lv:0,read:'No hay medidas de fuerza reportadas. La única referencia a asambleas es retrospectiva (conflicto histórico de Longchamps).',terms:[['asamblea (histórica)',1],['paro',0],['huelga',0],['quite de colaboración',0],['bloqueo',0],['“no sale la leche”',0],['conciliación obligatoria',0]]},
+s6:{n:'06',title:'Crisis del sector lácteo',lv:4,read:'Eje dominante. Pérdidas x4 ($4.791M en 1S 2026) + rumor falso de quiebra (confusión con SanCor) generaron el pico del período. El marco “así terminan las lácteas” ya circula solo.',terms:[['quiebra (rumor)',41],['SanCor',25],['fuerte caída',8],['pérdidas 1S',6],['caída de consumo',4],['cadena de pagos',2],['tamberos',0],['Verónica',0]]},
+s7:{n:'07',title:'Geografía y activos',lv:2,read:'Territorio activo fuera del eje bonaerense: Patagonia por Frío Sur y La Rioja por la cuasimoneda. Sumar localidades de centros de distribución afectados cuando se confirmen.',terms:[['La Rioja',4],['Trenque Lauquen',4],['Chubut',2],['Esquel',1],['Comodoro',1],['General Rodríguez',0],['Chivilcoy',0]]},
+s8:{n:'08',title:'Sentimiento, reputación y activación',lv:3,read:'28% negativo, pero dirigido al Gobierno (“gobierno de inútiles”, #gobiernoCriminal). No hay activación contra la marca: cero boicot o cambio de marca.',terms:[['negativo',41],['gobierno de inútiles',2],['sin indemnización',1],['boicot',0],['dejar de comprar',0],['codicia empresarial',0],['socialwashing',0]]},
+s9:{n:'09',title:'Amplificadores externos',lv:1,read:'Ningún actor institucional (Trabajo, concejo, intendente, diputados) se pronunció. Hashtags del monitoreo sin uso salvo #LaSerenisima.',terms:[['#LaSerenisima',7],['#gobiernoCriminal',1],['#Milei',2],['#Mastellone',1],['#ATILRA',0],['#Camioneros',0],['#NosDejanSinTrabajo',0],['Ministerio de Trabajo',0]]}
+};
+const fmt=n=>n>=1000?(n/1000).toFixed(1).replace('.',',')+' mil':String(n);
+const sc=s=>s==='neg'?R:s==='pos'?G:'#5F6670';
+const mapPost=p=>({...p,eng:fmt(p.eng),sc:sc(p.s)});
+const dstr=d=>String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+
+class Component extends DCLogic {
+  state={period:this.props.defaultPeriod??'30d',hover:null,sel:null,filter:'all',showWhy:false,showRisk:false,exp:{},showChart:false,day:null,showPosts:false};
+  componentDidMount(){this._k=e=>{if(e.key==='Escape')this.setState(s=>s.day?{day:null}:s.sel?{sel:null}:{exp:{},showRisk:false,showChart:false})};window.addEventListener('keydown',this._k);
+    this._align=()=>{const m=this.mapRef.current,k=this.kpiRef.current;if(!m||!k)return;const b=m.querySelector('[data-node="01"]');if(!b)return;
+      const cur=this.state.kpiOffset||0;const hd=k.previousElementSibling;const base=hd?hd.getBoundingClientRect().bottom+20:k.getBoundingClientRect().top-cur;const d=Math.round(b.getBoundingClientRect().top-base);const off=Math.max(0,d);if(Math.abs(off-cur)>1)this.setState({kpiOffset:off})};
+    this._ro=new ResizeObserver(()=>this._align());setTimeout(()=>{this.mapRef.current&&this._ro.observe(this.mapRef.current);this._align()},50);window.addEventListener('resize',this._align);document.fonts&&document.fonts.ready.then(()=>this._align());[300,1000].forEach(t=>setTimeout(()=>this._align(),t));
+    fetch('/api/data',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(!d||!Array.isArray(d.daily))return;
+      DAILY=d.daily;START=new Date(d.start+'T12:00:00');if(Array.isArray(d.posts)&&d.posts.length)POSTS=d.posts;
+      if(d.secs)Object.keys(d.secs).forEach(k=>{if(SECS[k])SECS[k]={...SECS[k],...d.secs[k]}});
+      LIVE={...LIVE,...d.kpi,updatedAt:d.updatedAt,notes:d.notes,why:d.why,peakDay:d.peakDay,peakNote:d.peakNote??''};this.forceUpdate()}).catch(()=>{})}
+  componentWillUnmount(){window.removeEventListener('keydown',this._k);this._ro&&this._ro.disconnect();window.removeEventListener('resize',this._align)}
+  componentDidUpdate(){this._align&&this._align()}
+  mapRef=React.createRef();kpiRef=React.createRef();
+  renderVals(){
+    const days={'7d':7,'14d':14,'30d':31}[this.state.period]||31;
+    const slice=DAILY.slice(-days).map((v,i)=>{const d=new Date(START);d.setDate(d.getDate()+DAILY.length-days+i);return {v,d:dstr(d)}});
+    const max=Math.max(...slice.map(s=>s.v),1);
+    const total=slice.reduce((a,b)=>a+b.v,0);
+    const pk=slice.reduce((a,b)=>b.v>a.v?b:a,slice[0]);
+    const hv=this.state.hover!=null?slice[this.state.hover]:null;
+    const bars=slice.map((s,i)=>({h:Math.round(s.v/max*100),v:s.v,color:s.v===pk.v?R:(s.v>=8?O:G),op:this.state.hover==null||this.state.hover===i?1:.45,showNote:s.v===pk.v||this.state.hover===i,onEnter:()=>this.setState({hover:i}),onClick:()=>this.setState({day:s})}));
+    const periods=[['7d','7 días'],['14d','14 días'],['30d','30 días']].map(([k,l])=>({label:l,bg:this.state.period===k?'#DCDFE3':'transparent',fg:K,onClick:()=>this.setState({period:k,hover:null})}));
+    const lv={};Object.keys(SECS).forEach(k=>lv[k]=LV[SECS[k].lv]);
+    const open={};Object.keys(SECS).forEach(k=>open[k]=()=>this.setState({sel:k,exp:{}}));
+    const bm=52;
+    const brandBars=[['Arcor',52,'#C9CDD2'],['La Serenísima',47,G],['Danone',41,'#7A828C'],['Mastellone',29,'#DCDFE3'],['Bagley',0,'#AEB4BB']].map(([t,v,c])=>({t,v,c,w:Math.max(v/bm*100,v?4:0)}));
+    const people=Array.from({length:130},(_,i)=>({c:i<13?R:'#DCDFE3'}));
+    const act=(t,v)=>({t,v,fg:v?K:'#9AA1A9',fw:v?700:500});
+    const unions=[{g:'Lecheros',items:[act('ATILRA',1),act('Heber Ríos',1),act('Ponce',0),act('OSPIL',0)]},{g:'Transporte',items:[act('Camioneros',0),act('H. Moyano',0),act('P. Moyano',0)]},{g:'Paraguas',items:[act('CGT',0),act('UOM',0)]}];
+    const steps=['Asamblea','Estado de alerta','Quite de colaboración','Paro','Bloqueo / acampe','Conciliación obligatoria'];
+    const ladder=steps.map((t,i)=>({t,w:40+i*11,c:i===0?'#EAF6EA':'#F4F4F2',fg:i===0?'#3E8E48':'#8B929A',note:i===0?'1 mención histórica':''}));
+    const places=[['La Rioja',4,'Chachos'],['Trenque Lauquen',4,'planta'],['Chubut',2,'Frío Sur'],['Esquel',1,'faltantes'],['Comodoro',1,'góndolas'],['Gral. Rodríguez',0,'planta central'],['Chivilcoy',0,'planta']].map(([t,v,p])=>({t,v,p,bg:v>=4?'#F1F2F4':v?'#EAF6EA':'#F1F2F4',fg:v>=4?G:v?'#3E8E48':'#9AA1A9'}));
+    const tags=[['#LaSerenisima',7],['#Milei',2],['#gobiernoCriminal',1],['#Mastellone',1],['#ATILRA',0],['#Camioneros',0],['#NosDejanSinTrabajo',0],['#SinLeche',0]].map(([t,v])=>({t,v,bg:v?(v>=5?G:'#F1F2F4'):'#F1F2F4',fg:v>=5?'#1F2328':v?'#3A4048':'#9AA1A9'}));
+    const ttl={};Object.keys(SECS).forEach(k=>ttl[k]=SECS[k].n+' · '+SECS[k].title);const toggle={},exp={},chev={};Object.keys(SECS).forEach(k=>{exp[k]=!!this.state.exp[k];chev[k]='↗';toggle[k]=e=>{if(e&&e.stopPropagation)e.stopPropagation();this.setState(s=>({exp:s.exp[k]?{}:{[k]:true}}))}});
+    let day=null;if(this.state.day){const dd=this.state.day;const ps=POSTS.filter(p=>p.d===dd.d).sort((a,b)=>b.eng-a.eng).map(mapPost);
+      day={d:dd.d,v:dd.v,posts:ps,note:dd.v===0?'Sin menciones este día.':ps.length?(ps.length<dd.v?`Se muestran las ${ps.length} publicaciones con más interacción de ${dd.v} menciones.`:'Todas las menciones del día.'):'Menciones de bajo alcance: ninguna entre las publicaciones destacadas del período.'};}
+    const ud=new Date(LIVE.updatedAt),tzf=o=>new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Buenos_Aires',...o}).format(ud);
+    const updatedLabel=tzf({day:'2-digit',month:'2-digit',year:'numeric'})+' · '+tzf({hour:'2-digit',minute:'2-digit',hour12:false});
+    const pT=Math.max(LIVE.x+LIVE.ig+LIVE.tt,1),pc=v=>Math.round(v/pT*100)+'%',a=LIVE.x/pT*100,b=a+LIVE.ig/pT*100;
+    const live={total:LIVE.total,neg:LIVE.neg,negPct:Math.round(LIVE.neg/Math.max(LIVE.total,1)*100)+'%',x:LIVE.x,ig:LIVE.ig,tt:LIVE.tt,xPct:pc(LIVE.x),igPct:pc(LIVE.ig),
+      pie:`conic-gradient(#AEB4BB 0 ${a}%,#7BC47F ${a}% ${b}%,#DCDFE3 ${b}% 100%)`};
+    const tT=Math.max(LIVE.total,1),tp=(LIVE.pos??0),tn=LIVE.neg,tu=Math.max(LIVE.total-tn-tp,0),P3=v=>+(v/tT*100).toFixed(2),pp=v=>Math.round(v/tT*100)+'%';
+    const tone={neg:tn,neu:tu,pos:tp,negPct:pp(tn),neuPct:pp(tu),posPct:pp(tp),negDash:P3(tn)+' '+(100-P3(tn)),neuDash:P3(tu)+' '+(100-P3(tu)),neuOff:-P3(tn),posDash:P3(tp)+' '+(100-P3(tp)),posOff:-(P3(tn)+P3(tu))};
+    let sel=null;
+    if(this.state.sel){const s=SECS[this.state.sel];const num=parseInt(s.n,10);const posts=POSTS.filter(p=>p.s_.includes(num)).map(mapPost);
+      sel={n:s.n,title:s.title,read:s.read,empty:posts.length===0,posts,terms:s.terms.map(([t,v])=>({t,v,bg:v?'#F1F2F4':'#F1F2F4',fg:v?'#3A4048':'#9AA1A9'}))};}
+    const vis={};Object.keys(SECS).forEach(k=>{const l=SECS[k].lv;vis[k]=this.state.filter==='all'||(this.state.filter==='on'?l>=2:l<2)});
+    const filters=[['all','Todos'],['on','Con señal'],['off','Latentes']].map(([k,l])=>({label:l,bg:this.state.filter===k?'#DCDFE3':'transparent',fg:'#1F2328',onClick:()=>this.setState({filter:k})}));
+    const SEM={r:'#E5484D',y:'#F5B82E',g:'#6DBE45'};
+    const semOf=l=>l>=4?'r':l>=3?'y':'g';
+    const SHORT={s1:'Marca',s2:'Despidos',s3:'Logística',s4:'Sindicatos',s5:'Acción sindical',s6:'Crisis láctea',s7:'Geografía',s8:'Sentimiento',s9:'Amplificadores'};
+    const LBL={r:'Riesgo alto',y:'Riesgo medio',g:'Riesgo bajo'};
+    const keys=Object.keys(SECS);
+    const heroNodes=keys.map((k,i)=>{const a=(i*40-90)*Math.PI/180;const s=semOf(SECS[k].lv);
+      return {n:SECS[k].n,t:SHORT[k],x:+(50+38*Math.cos(a)).toFixed(2),y:+(50+38*Math.sin(a)).toFixed(2),lvl:LBL[s],tc:s==='y'?'#B07A00':SEM[s],
+        lights:['r','y','g'].map(c=>({c:SEM[c],op:c===s?1:.22,sh:c===s?'0 0 6px '+SEM[c]:'none'})),onClick:()=>this.setState({sel:k})};});
+    const heroLegend=['r','y','g'].map(s=>({c:SEM[s],t:LBL[s],names:keys.filter(k=>semOf(SECS[k].lv)===s).map(k=>SHORT[k]).join(' · ')||'—'}));
+    const E=React.createElement;
+    const ticks=[];for(let j=0;j<144;j++){const deg=j*2.5-90;const a=deg*Math.PI/180;const idx=Math.round(((deg+90+360)%360)/40)%9;const col=SEM[semOf(SECS[keys[idx]].lv)];
+      ticks.push(E('line',{key:j,x1:(38*Math.cos(a)).toFixed(2),y1:(38*Math.sin(a)).toFixed(2),x2:(47*Math.cos(a)).toFixed(2),y2:(47*Math.sin(a)).toFixed(2),stroke:col,strokeWidth:.7,strokeLinecap:'round',opacity:.85}));}
+    const ringEl=E('svg',{viewBox:'-50 -50 100 100',style:{position:'absolute',inset:0,width:'100%',height:'100%'}},ticks);
+    const blobEl=E('div',{style:{position:'absolute',inset:'-18%',borderRadius:'50%',filter:'blur(28px)',animation:'breathe 7s ease-in-out infinite alternate',background:'radial-gradient(circle at 30% 35%, rgba(229,72,77,.55), transparent 55%), radial-gradient(circle at 72% 30%, rgba(245,184,46,.6), transparent 55%), radial-gradient(circle at 55% 75%, rgba(109,190,69,.6), transparent 55%)'}});
+    const linesEl=E('svg',{viewBox:'0 0 100 100',style:{position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none'}},keys.map((k,i)=>{const a=(i*40-90)*Math.PI/180;const col=SEM[semOf(SECS[k].lv)];
+      return E('line',{key:k,x1:50+29*Math.cos(a),y1:50+29*Math.sin(a),x2:50+33.5*Math.cos(a),y2:50+33.5*Math.sin(a),stroke:col,strokeWidth:.35,strokeDasharray:'1 1'});}));
+    return {
+      showPosts:this.state.showPosts,postsChev:this.state.showPosts?'▴':'▾',togglePosts:()=>this.setState(s=>({showPosts:!s.showPosts})),
+      ttl,toggle,exp,chev,hasDay:!!day,day:day||{posts:[]},closeDay:()=>this.setState({day:null}),
+      showChart:this.state.showChart,openChart:()=>this.setState({showChart:true}),closeChart:()=>this.setState({showChart:false,hover:null}),
+      heroNodes,heroLegend,ringEl,blobEl,linesEl,
+      mapRef:this.mapRef,kpiRef:this.kpiRef,kpiOffset:this.state.kpiOffset||0,
+      pulseDotG:E('span',{style:{width:10,height:10,borderRadius:'50%',background:'#7BC47F',animation:'pulseg 1.6s ease-out infinite',flex:'none'}}),
+      pulseDot:E('span',{style:{width:10,height:10,borderRadius:'50%',background:'#E5484D',animation:'pulse 1.6s ease-out infinite',flex:'none'}}),
+      showRisk:this.state.showRisk,openRisk:()=>this.setState({showRisk:true}),closeRisk:()=>this.setState({showRisk:false}),
+      vis,filters,showWhy:this.state.showWhy,whyLabel:this.state.showWhy?'Ocultar justificación':'¿Por qué es negativo?',toggleWhy:()=>this.setState(s=>({showWhy:!s.showWhy})),
+      tone,updatedLabel,nextLabel:'mañana · 10:00',live,
+      periods,bars,clearHover:()=>this.setState({hover:null}),
+      hoverLabel:hv?`${hv.d} · ${hv.v} menciones`:'Tocá una barra para ver las menciones del día',
+      axis:{start:slice[0].d,end:slice[slice.length-1].d},
+      kpi:{total,peak:pk.v,peakDay:pk.d,peakNote:LIVE.peakNote!=null?(pk.d===LIVE.peakDay&&LIVE.peakNote?' ('+LIVE.peakNote+')':''):(pk.d==='14/09'?' (rumor falso de quiebra)':''),avg:(total/days).toFixed(1).replace('.',','),periodLabel:`últimos ${days===31?30:days} días`},
+      showAnnotations:this.props.showAnnotations??true,
+      notes:(LIVE.notes||NOTES).map((n,i)=>({...n,c:['#7BC47F','#1F2328','#3E8E48'][i%3]})),
+      why:LIVE.why||{a:'41 de 146 publicaciones cumplen ese criterio. La mayoría repite el rumor falso de quiebra del 14/09 (“declaró quiebra y cierra a fin de mes”) o usa las pérdidas de Mastellone para criticar al Gobierno (“gobierno de inútiles”, #gobiernoCriminal).',b:'el enojo apunta al contexto económico y político, no a la conducta de la empresa. Hay 0 llamados a boicot.'},
+      legend:LV.map((l,i)=>({t:l.t,c:['#ECEDEF','#DCDFE3','#C9CDD2','#BFE3C0','#7BC47F'][i]})),lv,open,brandBars,people,unions,ladder,places,tags,
+      quotes:['Gobierno de inútiles','#gobiernoCriminal','sin indemnización'],
+      institutions:['Min. de Trabajo','Sec. de Trabajo','Concejo Gral. Rodríguez','Intendente','Diputados'],
+      topPosts:POSTS.slice(0,7).map(mapPost),
+      hasSel:!!sel,sel:sel||{terms:[],posts:[]},close:()=>this.setState({sel:null}),stop:e=>e.stopPropagation()
+    };
+  }
+}
+</script>
+</body>
+</html>

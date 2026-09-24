@@ -1,0 +1,8 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/"
+  to = "/Dashboard%20La%20Serenisima%20v2.dc.html"
+  status = 200
