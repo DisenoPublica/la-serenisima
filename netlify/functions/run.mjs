@@ -1,9 +1,10 @@
-// Actualización manual: https://<sitio>.netlify.app/api/run?key=<RUN_KEY>
+// Botón "Actualizar" del tablero. Limite: una corrida cada 3 minutos.
+import { getStore } from '@netlify/blobs';
 import { runRefresh } from '../lib/core.mjs';
 export const config = { path: '/api/run' };
-export default async (req) => {
-  const key = new URL(req.url).searchParams.get('key');
-  const want = Netlify.env.get('RUN_KEY');
-  if (!want || key !== want) return new Response('No autorizado: cargá RUN_KEY en Netlify y usá ?key=...', { status: 401 });
-  return Response.json(await runRefresh('manual'));
+export default async () => {
+  const last = await getStore('serenisima').get('status', { type: 'json' });
+  if (last?.at && Date.now() - new Date(last.at).getTime() < 180000)
+    return Response.json({ status: last, skipped: 'Se actualizó hace menos de 3 minutos.' });
+  return Response.json({ status: await runRefresh('botón Actualizar') });
 };
