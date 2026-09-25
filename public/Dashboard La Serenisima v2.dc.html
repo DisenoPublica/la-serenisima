@@ -35,13 +35,6 @@ a:hover{color:#7BC47F}
       <span style="width:7px;height:7px;border-radius:50%;background:#7BC47F;flex:none"></span>
       <span>Última actualización con Meltwater: <b style="color:#1F2328">{{ updatedLabel }}</b></span>
     </div>
-    <button onClick="{{ runNow }}" disabled="{{ syncing }}" style="display:flex;align-items:center;gap:6px;border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:5px 12px;font-family:'Raleway';font-size:11px;font-weight:700;color:#1F2328;cursor:pointer;white-space:nowrap" style-hover="border-color:#7BC47F;color:#2F6E37">↻ {{ runLabel }}</button>
-    <sc-if value="{{ syncErr }}" hint-placeholder-val="{{ false }}">
-      <div title="{{ syncErrFull }}" style="display:flex;align-items:center;gap:7px;background:#FDECEC;border:1px solid #F3C4C6;border-radius:999px;padding:5px 11px;font-size:11px;color:#A12A2F;max-width:420px">
-        <span style="width:7px;height:7px;border-radius:50%;background:#E5484D;flex:none"></span>
-        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ syncErrText }}</span>
-      </div>
-    </sc-if>
   </div>
   
 </header>
@@ -70,8 +63,8 @@ a:hover{color:#7BC47F}
         {{ ringEl }}
         <div style="position:absolute;inset:22%;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px">
           <span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#3A4048;font-weight:700">Riesgo reputacional</span>
-          <span style="font-family:'Barlow Condensed';font-weight:800;font-size:30px;line-height:1;color:#1F2328">{{ overall }}</span>
-          <span style="font-size:11px;color:#3A4048">{{ live.total }} menciones · 30 días</span>
+          <span style="font-family:'Barlow Condensed';font-weight:800;font-size:30px;line-height:1;color:#1F2328">MODERADO</span>
+          <span style="font-size:11px;color:#3A4048">146 menciones · 30 días</span>
           <button onClick="{{ openRisk }}" style="margin-top:8px;border:0;background:#1F2328;color:#fff;border-radius:999px;padding:7px 14px;font-family:'Raleway';font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;box-shadow:0 6px 16px rgba(31,35,40,.18)" style-hover="background:#F39200">Conocé un poco más</button>
         </div>
       </div>
@@ -402,7 +395,7 @@ a:hover{color:#7BC47F}
     <div style="display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;align-items:center;gap:12px">
         <span style="width:14px;height:14px;border-radius:50%;background:#7BC47F;box-shadow:0 0 0 5px rgba(123,196,127,.25)"></span>
-        <span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;letter-spacing:.03em;line-height:1">RIESGO REPUTACIONAL: {{ overall }}</span>
+        <span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;letter-spacing:.03em;line-height:1">RIESGO REPUTACIONAL: MODERADO</span>
       </div>
       <p style="margin:0;font-size:12px;line-height:1.5;opacity:.9;text-wrap:pretty"><b>Qué medimos:</b> la probabilidad de que la conversación en redes sobre despidos y reestructuración logística de La Serenísima escale a una <b>crisis de reputación de la marca</b> (boicot, conflicto gremial visible o intervención política).</p>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
@@ -502,10 +495,10 @@ class Component extends DCLogic {
     this._align=()=>{const m=this.mapRef.current,k=this.kpiRef.current;if(!m||!k)return;const b=m.querySelector('[data-node="01"]');if(!b)return;
       const cur=this.state.kpiOffset||0;const hd=k.previousElementSibling;const base=hd?hd.getBoundingClientRect().bottom+20:k.getBoundingClientRect().top-cur;const d=Math.round(b.getBoundingClientRect().top-base);const off=Math.max(0,d);if(Math.abs(off-cur)>1)this.setState({kpiOffset:off})};
     this._ro=new ResizeObserver(()=>this._align());setTimeout(()=>{this.mapRef.current&&this._ro.observe(this.mapRef.current);this._align()},50);window.addEventListener('resize',this._align);document.fonts&&document.fonts.ready.then(()=>this._align());[300,1000].forEach(t=>setTimeout(()=>this._align(),t));
-    this._load=()=>fetch('/api/data',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;if(d.status){LIVE={...LIVE,status:d.status};this.forceUpdate()}if(!Array.isArray(d.daily))return;
+    fetch('/api/data',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(!d||!Array.isArray(d.daily))return;
       DAILY=d.daily;START=new Date(d.start+'T12:00:00');if(Array.isArray(d.posts)&&d.posts.length)POSTS=d.posts;
       if(d.secs)Object.keys(d.secs).forEach(k=>{if(SECS[k])SECS[k]={...SECS[k],...d.secs[k]}});
-      LIVE={...LIVE,...d.kpi,status:d.status,updatedAt:d.updatedAt,notes:d.notes,why:d.why,peakDay:d.peakDay,peakNote:d.peakNote??''};this.forceUpdate()}).catch(()=>{});this._load()}
+      LIVE={...LIVE,...d.kpi,updatedAt:d.updatedAt,notes:d.notes,why:d.why,peakDay:d.peakDay,peakNote:d.peakNote??''};this.forceUpdate()}).catch(()=>{})}
   componentWillUnmount(){window.removeEventListener('keydown',this._k);this._ro&&this._ro.disconnect();window.removeEventListener('resize',this._align)}
   componentDidUpdate(){this._align&&this._align()}
   mapRef=React.createRef();kpiRef=React.createRef();
@@ -552,8 +545,6 @@ class Component extends DCLogic {
     const heroNodes=keys.map((k,i)=>{const a=(i*40-90)*Math.PI/180;const s=semOf(SECS[k].lv);
       return {n:SECS[k].n,t:SHORT[k],x:+(50+38*Math.cos(a)).toFixed(2),y:+(50+38*Math.sin(a)).toFixed(2),lvl:LBL[s],tc:s==='y'?'#B07A00':SEM[s],
         lights:['r','y','g'].map(c=>({c:SEM[c],op:c===s?1:.22,sh:c===s?'0 0 6px '+SEM[c]:'none'})),onClick:()=>this.setState({sel:k})};});
-    const nR=keys.filter(k=>semOf(SECS[k].lv)==='r').length,nY=keys.filter(k=>semOf(SECS[k].lv)==='y').length;
-    const overall=nR>=2?'ALTO':(nR===1||nY>=2)?'MODERADO':'BAJO';
     const heroLegend=['r','y','g'].map(s=>({c:SEM[s],t:LBL[s],names:keys.filter(k=>semOf(SECS[k].lv)===s).map(k=>SHORT[k]).join(' · ')||'—'}));
     const E=React.createElement;
     const ticks=[];for(let j=0;j<144;j++){const deg=j*2.5-90;const a=deg*Math.PI/180;const idx=Math.round(((deg+90+360)%360)/40)%9;const col=SEM[semOf(SECS[keys[idx]].lv)];
@@ -566,21 +557,12 @@ class Component extends DCLogic {
       showPosts:this.state.showPosts,postsChev:this.state.showPosts?'▴':'▾',togglePosts:()=>this.setState(s=>({showPosts:!s.showPosts})),
       ttl,toggle,exp,chev,hasDay:!!day,day:day||{posts:[]},closeDay:()=>this.setState({day:null}),
       showChart:this.state.showChart,openChart:()=>this.setState({showChart:true}),closeChart:()=>this.setState({showChart:false,hover:null}),
-      overall,heroNodes,heroLegend,ringEl,blobEl,linesEl,
+      heroNodes,heroLegend,ringEl,blobEl,linesEl,
       mapRef:this.mapRef,kpiRef:this.kpiRef,kpiOffset:this.state.kpiOffset||0,
       pulseDotG:E('span',{style:{width:10,height:10,borderRadius:'50%',background:'#7BC47F',animation:'pulseg 1.6s ease-out infinite',flex:'none'}}),
       pulseDot:E('span',{style:{width:10,height:10,borderRadius:'50%',background:'#E5484D',animation:'pulse 1.6s ease-out infinite',flex:'none'}}),
       showRisk:this.state.showRisk,openRisk:()=>this.setState({showRisk:true}),closeRisk:()=>this.setState({showRisk:false}),
       vis,filters,showWhy:this.state.showWhy,whyLabel:this.state.showWhy?'Ocultar justificación':'¿Por qué es negativo?',toggleWhy:()=>this.setState(s=>({showWhy:!s.showWhy})),
-      syncing:!!this.state.syncing,runLabel:this.state.syncing?'Actualizando…':'Actualizar',
-      runNow:async()=>{if(this.state.syncing)return;this.setState({syncing:true});
-        let err=null;try{const r=await fetch('/api/run',{method:'POST'});const t=await r.text();let j=null;try{j=JSON.parse(t)}catch(_){}
-          if(!r.ok||!j)err='Error '+r.status+' al ejecutar /api/run: '+(t||'sin respuesta').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,160);
-          await this._load();if(j&&j.status)LIVE={...LIVE,status:j.status}}catch(e){err='No se pudo conectar con /api/run: '+e.message}
-        if(err)LIVE={...LIVE,status:{ok:false,at:new Date().toISOString(),error:err}};
-        this.setState({syncing:false})},
-      syncErr:!!(LIVE.status&&!LIVE.status.ok),syncErrFull:LIVE.status?.error||'',
-      syncErrText:LIVE.status&&!LIVE.status.ok?('Falló la actualización'+(LIVE.status.at?' del '+new Date(LIVE.status.at).toLocaleString('es-AR',{timeZone:'America/Argentina/Buenos_Aires',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'')+': '+(LIVE.status.error||'')):'',
       tone,updatedLabel,nextLabel:'mañana · 10:00',live,
       periods,bars,clearHover:()=>this.setState({hover:null}),
       hoverLabel:hv?`${hv.d} · ${hv.v} menciones`:'Tocá una barra para ver las menciones del día',
