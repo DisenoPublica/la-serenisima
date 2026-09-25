@@ -93,7 +93,29 @@ const AXES = {
 
 const NAMES = { s1:'Marca y controlantes', s2:'Conflicto laboral', s3:'Logística', s4:'Sindicatos', s5:'Acciones gremiales', s6:'Crisis láctea', s7:'Geografía', s8:'Sentimiento', s9:'Amplificadores externos' };
 const LV_TXT = ['sin señal','latente','bajo','medio','alto'];
-const LEVEL = n => n === 0 ? 0 : n < 3 ? 1 : n < 8 ? 2 : n < 20 ? 3 : 4;
+// Semáforo por eje: pondera cuánto pesa el eje en la conversación y cuán negativo es.
+// Rojo (4): ≥25% de las menciones y ≥30% negativas, o ≥15 menciones negativas.
+// Amarillo (3): ≥10% de las menciones, o ≥5 negativas.  Verde (2): con menciones.  Sin señal (0).
+const LEVEL = (hits, neg, total) => {
+  if (!hits) return 0;
+  const share = hits / Math.max(total, 1), negShare = neg / hits;
+  if ((share >= 0.25 && negShare >= 0.3) || neg >= 15) return 4;
+  if (share >= 0.10 || neg >= 5) return 3;
+  return 2;
+};
+// Junta todo el texto del documento, venga en el campo que venga.
+const textOf = d => {
+  const out = [];
+  const walk = (v, depth) => {
+    if (depth > 4 || v == null) return;
+    if (typeof v === 'string') { if (v.length > 2 && !/^https?:\/\//.test(v)) out.push(v); return; }
+    if (Array.isArray(v)) return v.forEach(x => walk(x, depth + 1));
+    if (typeof v === 'object') Object.entries(v).forEach(([k, x]) => { if (!/url|id$|date|image|avatar|lang|country|type/i.test(k)) walk(x, depth + 1); });
+  };
+  walk(d.content ?? d, 0);
+  ['title', 'body', 'text', 'opening_text', 'hit_sentence', 'snippet'].forEach(k => typeof d[k] === 'string' && out.push(d[k]));
+  return [...new Set(out)].join(' ');
+};
 const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 const ymd = d => d.toISOString().slice(0, 10);
 const dm = d => d.slice(8, 10) + '/' + d.slice(5, 7);
@@ -119,7 +141,7 @@ async function fetchAll(start, end) {
 
 // Mapeo defensivo del template api.json — ajustar si el payload real difiere
 const pick = d => {
-  const text = [d.content?.title, d.content?.opening_text, d.content?.body].filter(Boolean).join(' ');
+  const text = textOf(d);
   const src = norm(d.source?.type || d.source?.name || d.content_type || d.url || '');
   const pl = /twitter|x\.com|^x$/.test(src) ? 'X' : /instagram/.test(src) ? 'IG' : /tiktok/.test(src) ? 'TikTok' : 'Otro';
   const s = norm(d.enrichments?.sentiment || d.sentiment || '');
@@ -160,19 +182,23 @@ function whyText(docs) {
   };
 }
 
+let diag = null;
 async function build() {
   const now = new Date(), from = new Date(now); from.setDate(from.getDate() - (DAYS - 1));
   const startDay = ymd(from);
-  const docs = (await fetchAll(startDay + 'T00:00:00', ymd(now) + 'T23:59:59')).map(pick);
+  const raw = await fetchAll(startDay + 'T00:00:00', ymd(now) + 'T23:59:59');
+  const docs = raw.map(pick);
+  diag = { campos: Object.keys(raw[0] || {}), camposContenido: Object.keys(raw[0]?.content || {}), sinTexto: docs.filter(d => !d.text).length, sentimiento: [...new Set(docs.map(d => d.s))] };
   const daily = Array(DAYS).fill(0);
   docs.forEach(d => { const i = Math.round((new Date(d.date) - new Date(startDay)) / 864e5); if (i >= 0 && i < DAYS) daily[i]++; });
 
   const secs = {};
   Object.entries(AXES).forEach(([k, terms]) => {
     const counts = terms.map(t => [t, docs.filter(d => has(d, t)).length]);
-    const hits = docs.filter(d => terms.some(t => has(d, t))).length;
-    const lv = LEVEL(hits);
-    secs[k] = { terms: counts, lv, read: readAxis(k, counts, hits, lv) };
+    const hd = docs.filter(d => terms.some(t => has(d, t)));
+    const hits = hd.length, neg = hd.filter(d => d.s === 'neg').length;
+    const lv = LEVEL(hits, neg, docs.length);
+    secs[k] = { terms: counts, lv, hits, neg, read: readAxis(k, counts, hits, lv) };
   });
   const axisOf = d => Object.entries(AXES).filter(([, t]) => t.some(x => has(d, x))).map(([k]) => +k.slice(1));
   const posts = [...docs].sort((a, b) => b.eng - a.eng).slice(0, 200)
@@ -191,10 +217,11 @@ async function build() {
 export async function runRefresh(source) {
   const store = getStore('serenisima'), at = new Date().toISOString();
   let status;
+  await store.setJSON('status', { ok: false, at, source, error: 'La actualización empezó (' + source + ') pero no terminó: se cortó por tiempo o por un error interno. Ver Netlify → Logs → Functions.' });
   try {
     if (!env('MELTWATER_API_KEY')) throw new Error('Falta la variable MELTWATER_API_KEY en Netlify (y hacer un nuevo deploy después de cargarla).');
     const r = await build();
-    status = { ok: true, at, source, docs: r.docs };
+    status = { ok: true, at, source, docs: r.docs, diag };
   } catch (e) {
     status = { ok: false, at, source, error: String(e.message || e).slice(0, 400) };
   }
