@@ -36,6 +36,7 @@ a:hover{color:#7BC47F}
       <span>Última actualización con Meltwater: <b style="color:#1F2328">{{ updatedLabel }}</b></span>
     </div>
     <button onClick="{{ runNow }}" disabled="{{ syncing }}" style="display:flex;align-items:center;gap:6px;border:1px solid #DCDFE3;background:#fff;border-radius:999px;padding:5px 12px;font-family:'Raleway';font-size:11px;font-weight:700;color:#1F2328;cursor:pointer;white-space:nowrap" style-hover="border-color:#7BC47F;color:#2F6E37">↻ {{ runLabel }}</button>
+    <sc-if value="{{ runMsg }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:600;color:#3E8E48;white-space:nowrap">{{ runMsg }}</span></sc-if>
     <sc-if value="{{ syncErr }}" hint-placeholder-val="{{ false }}">
       <div title="{{ syncErrFull }}" style="display:flex;align-items:center;gap:7px;background:#FDECEC;border:1px solid #F3C4C6;border-radius:999px;padding:5px 11px;font-size:11px;color:#A12A2F;max-width:420px">
         <span style="width:7px;height:7px;border-radius:50%;background:#E5484D;flex:none"></span>
@@ -123,7 +124,8 @@ a:hover{color:#7BC47F}
         <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600">
           <span style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:#AEB4BB"></span><span style="white-space:nowrap">X · {{ live.x }} ({{ live.xPct }})</span></span>
           <span style="display:flex;align-items:center;gap:6px;color:#3E8E48"><span style="width:9px;height:9px;border-radius:50%;background:#7BC47F"></span><span style="white-space:nowrap">IG · {{ live.ig }} ({{ live.igPct }})</span></span>
-          <span style="display:flex;align-items:center;gap:6px;color:#5F6670;font-weight:500"><span style="width:9px;height:9px;border-radius:50%;background:#DCDFE3"></span><span style="white-space:nowrap">TikTok · {{ live.tt }}</span></span>
+          <span style="display:flex;align-items:center;gap:6px;color:#5F6670;font-weight:500"><span style="width:9px;height:9px;border-radius:50%;background:#1F2328"></span><span style="white-space:nowrap">TikTok · {{ live.tt }}</span></span>
+          <sc-if value="{{ live.hasOt }}" hint-placeholder-val="{{ false }}"><span style="display:flex;align-items:center;gap:6px;color:#5F6670;font-weight:500"><span style="width:9px;height:9px;border-radius:50%;background:#DCDFE3"></span><span style="white-space:nowrap">Prensa/web · {{ live.otros }} ({{ live.otPct }})</span></span></sc-if>
         </div>
       </div>
     </div>
@@ -489,7 +491,7 @@ class Component extends DCLogic {
     this._align=()=>{const m=this.mapRef.current,k=this.kpiRef.current;if(!m||!k)return;const b=m.querySelector('[data-node="01"]');if(!b)return;
       const cur=this.state.kpiOffset||0;const hd=k.previousElementSibling;const base=hd?hd.getBoundingClientRect().bottom+20:k.getBoundingClientRect().top-cur;const d=Math.round(b.getBoundingClientRect().top-base);const off=Math.max(0,d);if(Math.abs(off-cur)>1)this.setState({kpiOffset:off})};
     this._ro=new ResizeObserver(()=>this._align());setTimeout(()=>{this.mapRef.current&&this._ro.observe(this.mapRef.current);this._align()},50);window.addEventListener('resize',this._align);document.fonts&&document.fonts.ready.then(()=>this._align());[300,1000].forEach(t=>setTimeout(()=>this._align(),t));
-    this._load=()=>fetch('/api/data',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;if(d.status){LIVE={...LIVE,status:d.status};this.forceUpdate()}if(!Array.isArray(d.daily)||d.v!==2)return;
+    this._load=()=>fetch('/api/data',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;if(d.status){LIVE={...LIVE,status:d.status};this.forceUpdate()}if(!Array.isArray(d.daily)||d.v!==3){if(d.status&&d.status.ok){LIVE={...LIVE,status:{ok:false,at:d.status.at,error:'los datos guardados son del modelo de análisis anterior. Apretá Actualizar.'}};this.forceUpdate()}return;}
       DAILY=d.daily;START=new Date(d.start+'T12:00:00');if(Array.isArray(d.posts)&&d.posts.length)POSTS=d.posts;
       if(d.secs)Object.keys(d.secs).forEach(k=>{if(SECS[k])SECS[k]={...SECS[k],...d.secs[k]}});
       LIVE={...LIVE,...d.kpi,status:d.status,updatedAt:d.updatedAt,notes:d.notes,why:d.why,peakDay:d.peakDay,peakNote:d.peakNote??''};this.forceUpdate()}).catch(()=>{});this._load()}
@@ -521,13 +523,13 @@ class Component extends DCLogic {
       day={d:dd.d,v:dd.v,posts:ps,note:dd.v===0?'Sin menciones este día.':ps.length?(ps.length<dd.v?`Se muestran las ${ps.length} publicaciones con más interacción de ${dd.v} menciones.`:'Todas las menciones del día.'):'Menciones de bajo alcance: ninguna entre las publicaciones destacadas del período.'};}
     const ud=new Date(LIVE.updatedAt),tzf=o=>new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Buenos_Aires',...o}).format(ud);
     const updatedLabel=tzf({day:'2-digit',month:'2-digit',year:'numeric'})+' · '+tzf({hour:'2-digit',minute:'2-digit',hour12:false});
-    const pT=Math.max(LIVE.x+LIVE.ig+LIVE.tt,1),pc=v=>Math.round(v/pT*100)+'%',a=LIVE.x/pT*100,b=a+LIVE.ig/pT*100;
-    const live={total:LIVE.total,neg:LIVE.neg,negPct:Math.round(LIVE.neg/Math.max(LIVE.total,1)*100)+'%',x:LIVE.x,ig:LIVE.ig,tt:LIVE.tt,xPct:pc(LIVE.x),igPct:pc(LIVE.ig),
-      pie:`conic-gradient(#AEB4BB 0 ${a}%,#7BC47F ${a}% ${b}%,#DCDFE3 ${b}% 100%)`};
+    const OT=LIVE.otros||0,pT=Math.max(LIVE.x+LIVE.ig+LIVE.tt+OT,1),pc=v=>Math.round(v/pT*100)+'%',a=LIVE.x/pT*100,b=a+LIVE.ig/pT*100,c2=b+LIVE.tt/pT*100;
+    const live={total:LIVE.total,neg:LIVE.neg,negPct:Math.round(LIVE.neg/Math.max(LIVE.total,1)*100)+'%',x:LIVE.x,ig:LIVE.ig,tt:LIVE.tt,xPct:pc(LIVE.x),igPct:pc(LIVE.ig),otros:OT,otPct:pc(OT),hasOt:OT>0,
+      pie:`conic-gradient(#AEB4BB 0 ${a}%,#7BC47F ${a}% ${b}%,#1F2328 ${b}% ${c2}%,#DCDFE3 ${c2}% 100%)`};
     const tT=Math.max(LIVE.total,1),tp=(LIVE.pos??0),tn=LIVE.neg,tu=Math.max(LIVE.total-tn-tp,0),P3=v=>+(v/tT*100).toFixed(2),pp=v=>Math.round(v/tT*100)+'%';
     const tone={neg:tn,neu:tu,pos:tp,negPct:pp(tn),neuPct:pp(tu),posPct:pp(tp),negDash:P3(tn)+' '+(100-P3(tn)),neuDash:P3(tu)+' '+(100-P3(tu)),neuOff:-P3(tn),posDash:P3(tp)+' '+(100-P3(tp)),posOff:-(P3(tn)+P3(tu))};
     const TOT=Math.max(LIVE.total,1);
-    const trigOf=k=>{const on=[],off=[];(TRIG[k]||[]).forEach(t=>{const f=SECS[k].terms.find(([l])=>nrm(l).includes(nrm(t)));const v=f?f[1]:0;(v?on:off).push([t,v])});return {on,off}};
+    const trigOf=k=>{const on=[],off=[];if(Array.isArray(SECS[k].esc)){SECS[k].esc.forEach(([t,v])=>(v?on:off).push([t,v]));return {on,off}}(TRIG[k]||[]).forEach(t=>{const f=SECS[k].terms.find(([l])=>nrm(l).includes(nrm(t)));const v=f?f[1]:0;(v?on:off).push([t,v])});return {on,off}};
     const ax={};Object.keys(SECS).forEach(k=>{const s=SECS[k],l=s.lv,se=semOf(l),tr=trigOf(k);
       const terms=s.terms.filter(([t])=>!(k==='s8'&&/^negativo$/i.test(t))).slice().sort((a,b)=>b[1]-a[1]);const mx=Math.max(...terms.map(t=>t[1]),1);
       const hits=s.hits??0,share=Math.round(hits/TOT*100),negP=hits?Math.round((s.neg||0)/hits*100):0;
@@ -558,7 +560,7 @@ class Component extends DCLogic {
     const risk={dot:OVC[oi],lower:overall.toLowerCase(),
       why:(reds.length?lst(reds)+(reds.length>1?' están':' está')+' en riesgo alto':'Ningún eje está en riesgo alto')+(yels.length?'; '+lst(yels)+' en riesgo medio':'')+'. Pico del período: '+pk30.v+' menciones el '+dstr(pd)+'. Tono negativo: '+live.negPct+' de '+LIVE.total+' publicaciones.',
       upTitle:tOn.length?'Señales de escalada presentes:':'Qué lo subiría:',
-      up:tOn.length?lst(tOn.map(([t,v])=>'“'+t+'” ('+v+')'))+'. Si siguen creciendo, el riesgo sube de nivel.':'que aparezcan menciones de '+lst(tOff.slice(0,6).map(t=>'“'+t+'”'))+' (hoy en 0), o que el tono negativo supere el 50%.',
+      up:tOn.length?lst(tOn.map(([t,v])=>'“'+t+'” ('+v+')'))+'. Si siguen creciendo, el riesgo sube de nivel.':'que aparezcan menciones de '+lst(tOff.slice(0,6).map(t=>'“'+t+'”'))+' (hoy en 0)'+(LIVE.neg/Math.max(LIVE.total,1)<0.5?', o que el tono negativo supere el 50%.':'. El tono negativo ya supera el 50%.'),
       scale:OV.map((t,i)=>({t:t.charAt(0)+t.slice(1).toLowerCase(),bg:i<=oi?OVC[i]:'#DCDFE3',fw:i===oi?700:500,fg:i===oi?'#1F2328':'#8B929A'}))};
     const heroLegend=['r','y','g'].map(s=>({c:SEM[s],t:LBL[s],names:keys.filter(k=>semOf(SECS[k].lv)===s).map(k=>SHORT[k]).join(' · ')||'—'}));
     const E=React.createElement;
@@ -578,11 +580,12 @@ class Component extends DCLogic {
       pulseDot:E('span',{style:{width:10,height:10,borderRadius:'50%',background:'#E5484D',animation:'pulse 1.6s ease-out infinite',flex:'none'}}),
       showRisk:this.state.showRisk,openRisk:()=>this.setState({showRisk:true}),closeRisk:()=>this.setState({showRisk:false}),
       vis,filters,showWhy:this.state.showWhy,whyLabel:this.state.showWhy?'Ocultar justificación':'¿Por qué es negativo?',toggleWhy:()=>this.setState(s=>({showWhy:!s.showWhy})),
-      syncing:!!this.state.syncing,runLabel:this.state.syncing?'Actualizando…':'Actualizar',
+      runMsg:this.state.runMsg||'',syncing:!!this.state.syncing,runLabel:this.state.syncing?'Actualizando…':'Actualizar',
       runNow:async()=>{if(this.state.syncing)return;this.setState({syncing:true});
         let err=null;try{const r=await fetch('/api/run',{method:'POST'});const t=await r.text();let j=null;try{j=JSON.parse(t)}catch(_){}
           if(!r.ok||!j)err='Error '+r.status+' al ejecutar /api/run: '+(t||'sin respuesta').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,160);
-          await this._load();if(j&&j.status)LIVE={...LIVE,status:j.status}}catch(e){err='No se pudo conectar con /api/run: '+e.message}
+          await this._load();if(j&&j.status&&!j.status.ok)LIVE={...LIVE,status:j.status};
+          this.setState({runMsg:j&&j.status&&j.status.ok?(j.skipped?'Ya estaba actualizado':'Actualizado · '+(j.status.docs??0)+' publicaciones'):''});setTimeout(()=>this.setState({runMsg:''}),6000)}catch(e){err='No se pudo conectar con /api/run: '+e.message}
         if(err)LIVE={...LIVE,status:{ok:false,at:new Date().toISOString(),error:err}};
         this.setState({syncing:false})},
       syncErr:!!(LIVE.status&&!LIVE.status.ok),syncErrFull:LIVE.status?.error||'',
