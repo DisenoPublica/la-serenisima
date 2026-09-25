@@ -1,7 +1,7 @@
 import { getStore } from '@netlify/blobs';
 export const config = { path: '/api/data' };
 export default async () => {
-  const data = await getStore('serenisima').get('data', { type: 'json' });
-  if (!data) return new Response('{"error":"sin datos aún"}', { status: 404, headers: { 'content-type': 'application/json' } });
-  return new Response(JSON.stringify(data), { headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=300' } });
+  const store = getStore('serenisima');
+  const [data, status] = await Promise.all([store.get('data', { type: 'json' }), store.get('status', { type: 'json' })]);
+  return Response.json({ ...(data || {}), status: status || { ok: false, error: 'La actualización nunca corrió todavía.' } }, { headers: { 'cache-control': 'no-store' } });
 };

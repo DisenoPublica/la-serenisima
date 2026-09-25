@@ -35,6 +35,12 @@ a:hover{color:#7BC47F}
       <span style="width:7px;height:7px;border-radius:50%;background:#7BC47F;flex:none"></span>
       <span>Última actualización con Meltwater: <b style="color:#1F2328">{{ updatedLabel }}</b></span>
     </div>
+    <sc-if value="{{ syncErr }}" hint-placeholder-val="{{ false }}">
+      <div title="{{ syncErrFull }}" style="display:flex;align-items:center;gap:7px;background:#FDECEC;border:1px solid #F3C4C6;border-radius:999px;padding:5px 11px;font-size:11px;color:#A12A2F;max-width:420px">
+        <span style="width:7px;height:7px;border-radius:50%;background:#E5484D;flex:none"></span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ syncErrText }}</span>
+      </div>
+    </sc-if>
   </div>
   
 </header>
@@ -495,10 +501,10 @@ class Component extends DCLogic {
     this._align=()=>{const m=this.mapRef.current,k=this.kpiRef.current;if(!m||!k)return;const b=m.querySelector('[data-node="01"]');if(!b)return;
       const cur=this.state.kpiOffset||0;const hd=k.previousElementSibling;const base=hd?hd.getBoundingClientRect().bottom+20:k.getBoundingClientRect().top-cur;const d=Math.round(b.getBoundingClientRect().top-base);const off=Math.max(0,d);if(Math.abs(off-cur)>1)this.setState({kpiOffset:off})};
     this._ro=new ResizeObserver(()=>this._align());setTimeout(()=>{this.mapRef.current&&this._ro.observe(this.mapRef.current);this._align()},50);window.addEventListener('resize',this._align);document.fonts&&document.fonts.ready.then(()=>this._align());[300,1000].forEach(t=>setTimeout(()=>this._align(),t));
-    fetch('/api/data',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(!d||!Array.isArray(d.daily))return;
+    fetch('/api/data',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;if(d.status){LIVE={...LIVE,status:d.status};this.forceUpdate()}if(!Array.isArray(d.daily))return;
       DAILY=d.daily;START=new Date(d.start+'T12:00:00');if(Array.isArray(d.posts)&&d.posts.length)POSTS=d.posts;
       if(d.secs)Object.keys(d.secs).forEach(k=>{if(SECS[k])SECS[k]={...SECS[k],...d.secs[k]}});
-      LIVE={...LIVE,...d.kpi,updatedAt:d.updatedAt,notes:d.notes,why:d.why,peakDay:d.peakDay,peakNote:d.peakNote??''};this.forceUpdate()}).catch(()=>{})}
+      LIVE={...LIVE,...d.kpi,status:d.status,updatedAt:d.updatedAt,notes:d.notes,why:d.why,peakDay:d.peakDay,peakNote:d.peakNote??''};this.forceUpdate()}).catch(()=>{})}
   componentWillUnmount(){window.removeEventListener('keydown',this._k);this._ro&&this._ro.disconnect();window.removeEventListener('resize',this._align)}
   componentDidUpdate(){this._align&&this._align()}
   mapRef=React.createRef();kpiRef=React.createRef();
@@ -563,6 +569,8 @@ class Component extends DCLogic {
       pulseDot:E('span',{style:{width:10,height:10,borderRadius:'50%',background:'#E5484D',animation:'pulse 1.6s ease-out infinite',flex:'none'}}),
       showRisk:this.state.showRisk,openRisk:()=>this.setState({showRisk:true}),closeRisk:()=>this.setState({showRisk:false}),
       vis,filters,showWhy:this.state.showWhy,whyLabel:this.state.showWhy?'Ocultar justificación':'¿Por qué es negativo?',toggleWhy:()=>this.setState(s=>({showWhy:!s.showWhy})),
+      syncErr:!!(LIVE.status&&!LIVE.status.ok),syncErrFull:LIVE.status?.error||'',
+      syncErrText:LIVE.status&&!LIVE.status.ok?('Falló la actualización'+(LIVE.status.at?' del '+new Date(LIVE.status.at).toLocaleString('es-AR',{timeZone:'America/Argentina/Buenos_Aires',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'')+': '+(LIVE.status.error||'')):'',
       tone,updatedLabel,nextLabel:'mañana · 10:00',live,
       periods,bars,clearHover:()=>this.setState({hover:null}),
       hoverLabel:hv?`${hv.d} · ${hv.v} menciones`:'Tocá una barra para ver las menciones del día',
