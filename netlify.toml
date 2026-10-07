@@ -1,0 +1,7 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+  command = "npm install && mkdir -p public && cp index.html support.js public/"
+
+[functions]
+  node_bundler = "esbuild"
